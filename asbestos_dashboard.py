@@ -25,9 +25,9 @@ px.set_mapbox_access_token(mapbox_access_token)
 try:
     DATABASE_URL = os.getenv('DATABASE_URL')
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
-    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+    app.config['DATABASE_URL'] = DATABASE_URL
 except:
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///asbestos.db'
+    app.config['DATABASE_URL'] = DATABASE_URL
 engine = create_engine(DATABASE_URL)
 
 # Fetch data function
