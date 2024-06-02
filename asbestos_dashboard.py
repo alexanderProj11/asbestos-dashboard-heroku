@@ -32,38 +32,70 @@ def fetch_data(table_name):
 
 # Create chart function
 def create_chart(df, selected_area, selected_condition):
-    if df.empty:
-        return px.bar(title="No data available")
-
-    df = df.sort_values('Forward Sortation Area')
+    """Generates a bar chart for the selected condition or overall notification counts, with dynamic title adjustments and sorting."""
+    # Sorting Forward Sortation Areas alphabetically
+    df = df.copy()
+    df['Forward Sortation Area'] = pd.Categorical(df['Forward Sortation Area'], categories=sorted(df['Forward Sortation Area'].unique()), ordered=True)
 
     if selected_condition not in df.columns:
-        df[selected_condition] = 0
+        df[selected_condition] = 0  # Add missing condition with default zero
 
     if selected_condition == "All Notifications":
-        count_df = df.groupby('Forward Sortation Area').size().reset_index(name='Counts')
+        # Count total notifications per area
+        count_df = df.groupby('Forward Sortation Area', observed=False).size().reset_index(name='Counts')
     else:
+        # Calculate the percentage of notifications with the selected condition
         condition_counts = df[df[selected_condition] == 1].groupby('Forward Sortation Area').size().reset_index(name='Condition Counts')
         total_counts = df.groupby('Forward Sortation Area').size().reset_index(name='Total Counts')
-        count_df = pd.merge(total_counts, condition_counts, on='Forward Sortation Area', how='left')
+        count_df = total_counts.merge(condition_counts, on='Forward Sortation Area', how='left')
         count_df['Condition Counts'].fillna(0, inplace=True)
         count_df['Condition Percentage'] = (count_df['Condition Counts'] / count_df['Total Counts']) * 100
 
-    if selected_area not in count_df['Forward Sortation Area'].values:
-        return px.bar(title="No data available for the selected area")
-
-    title_text = "Total Notifications per Area" if selected_condition == "All Notifications" else f"Percentage of {selected_condition} per Area"
-    area_value = count_df.loc[count_df['Forward Sortation Area'] == selected_area, 'Counts'].iloc[0] if selected_condition == "All Notifications" else count_df.loc[count_df['Forward Sortation Area'] == selected_area, 'Condition Percentage'].iloc[0]
-    title = f"{title_text} for {selected_area}: {area_value}"
-
-    count_df['Highlight'] = count_df['Forward Sortation Area'].apply(lambda x: 'Selected' if x == selected_area else 'Other')
+    count_df['Highlight'] = ['Selected' if x == selected_area else 'Other' for x in count_df['Forward Sortation Area']]
     color_discrete_map = {'Selected': 'red', 'Other': 'blue'}
 
-    fig = px.bar(count_df, x='Forward Sortation Area', y='Counts' if selected_condition == "All Notifications" else 'Condition Percentage',
-                 title=title, color='Highlight', color_discrete_map=color_discrete_map)
-
-    fig.update_layout(showlegend=False)
+     # Plotting the data with dynamic title
+    title = ""
+    if selected_condition == "All Notifications":
+        title = f'Total Notifications for {selected_area}: {count_df[count_df["Forward Sortation Area"] == selected_area]["Counts"].iloc[0]}' if selected_area != "All Areas" else 'Total Notifications per Area'
+        fig = px.bar(count_df, x='Forward Sortation Area', y='Counts', title=title,
+                     labels={'Counts': 'Total Notifications'}, color='Highlight', color_discrete_map=color_discrete_map)
+    else:
+        title = f'Percentage of {selected_condition} in {selected_area}: {count_df[count_df["Forward Sortation Area"] == selected_area]["Condition Percentage"].iloc[0]:.2f}%' if selected_area != "All Areas" else f'Percentage of {selected_condition} per Area'
+        fig = px.bar(count_df, x='Forward Sortation Area', y='Condition Percentage',
+                     title=title,
+                     labels={'Condition Percentage': f'Percentage of {selected_condition}'},
+                     color='Highlight', color_discrete_map=color_discrete_map)
+    
+    # Add text box for selected area if it's not 'All Areas'
+    if selected_area != "All Areas":
+        area_value = count_df.loc[count_df['Forward Sortation Area'] == selected_area, 'Counts'].iloc[0] if selected_condition == "All Notifications" else count_df.loc[count_df['Forward Sortation Area'] == selected_area, 'Condition Percentage'].iloc[0]
+        fig.add_annotation(
+            x=selected_area, 
+            y=area_value,
+            text=f"{area_value:.2f}%" if selected_condition != "All Notifications" else f"{int(area_value)} Total",
+            showarrow=True,
+            arrowhead=1,
+            ax=0,
+            ay=-40,
+            font=dict(color='red')
+        )
+    
+    # Explicitly defining color ordering for consistency
+    fig.update_layout(showlegend=False,
+        title_font=dict(family="Arial, sans-serif", size=22, color='Black'),
+        xaxis=dict(
+            title_font=dict(family="Arial, sans-serif", size=18, color='Black'),
+            tickfont=dict(family="Raleway, sans-serif", size=12, color='DarkRed')
+        ),
+        yaxis=dict(
+            title_font=dict(family="Arial, sans-serif", size=18, color='Black'),
+            tickfont=dict(family="Raleway, sans-serif", size=12, color='DarkRed')
+        )
+    )
+    fig.update_traces(marker_line_color='black', marker_line_width=1.5)
     return fig
+
 
 def create_table(df):
     if df.empty:
@@ -77,73 +109,102 @@ def create_table(df):
 
     return df.to_dict('records')
 
+
 def create_map(df, selected_area):
-    if df.empty:
-        return px.scatter_mapbox(title="No data available")
+    """
+    Generates a map visualization using Mapbox, enhanced with more interactive features.
 
-    # Filter the DataFrame based on the selected area
-    if selected_area == "All Areas":
-        filtered_df = df
-    else:
-        filtered_df = df[df['Forward Sortation Area'] == selected_area]
+    Args:
+        df (DataFrame): The dataframe containing the data to plot.
+        selected_area (str): The area selected by the user, or 'All Areas' for no filtering.
 
-    # Check if the DataFrame is still empty after filtering
-    if filtered_df.empty:
-        return px.scatter_mapbox(title="No data available for the selected area")
+    Returns:
+        plotly.graph_objs._figure.Figure: A figure object containing the map.
+    """
+    # Filtering the DataFrame based on the selected area
+    filtered_df = df if selected_area == "All Areas" else df[df['Forward Sortation Area'] == selected_area]
 
-    # Set the center of the map based on the median latitude and longitude of the filtered data
-    center_lat = filtered_df['Latitude'].median()
-    center_lon = filtered_df['Longitude'].median()
+    # Debugging: Print filtered data to ensure it's not empty and coordinates are present
+    print(filtered_df[['Latitude', 'Longitude']].dropna())
+
+    # Define the color scale based on a condition if present
+    color = 'Condition' if 'Condition' in df.columns else None
+
+    # Checking if there are any coordinates to plot
+    if filtered_df[['Latitude', 'Longitude']].dropna().empty:
+        raise ValueError("No valid latitude or longitude data to plot.")
+
+    # Determine center only if there are points to avoid errors on empty data
+    center = {"lat": filtered_df['Latitude'].median(), "lon": filtered_df['Longitude'].median()} if not filtered_df.empty and selected_area != "All Areas" else None
 
     # Create the scatter mapbox plot
     fig = px.scatter_mapbox(
         filtered_df,
         lat='Latitude',
         lon='Longitude',
-        color='Condition',  # Assuming you have a 'Condition' column to color points
-        hover_name='contractor',
-        hover_data={'formattedAddress': True, 'startDate': True, 'postalCode': True, 'Latitude': False, 'Longitude': False},
-        color_continuous_scale=px.colors.cyclical.IceFire,
+        color=color,  # Coloring points based on the 'Condition' column
+        hover_name='contractor',  # Main title for hover information
+        hover_data=['formattedAddress', 'startDate', 'postalCode'],  # Additional data shown on hover
+        color_continuous_scale=px.colors.cyclical.IceFire,  # Set the color scale
         size_max=15,
-        zoom=10,
-        center={"lat": center_lat, "lon": center_lon}
+        zoom=9 if selected_area == "All Areas" else 11,
+        center=center
     )
 
-    # Update layout settings
+    # Update map layout 
     fig.update_layout(
-        mapbox_style="streets",
+        mapbox_style="streets",  
         mapbox_accesstoken=mapbox_access_token,
-        margin={"r": 0, "t": 0, "l": 0, "b": 0}
+        margin={"r":0,"t":0,"l":0,"b":0}
     )
 
     return fig
 
 # Layout of the application
 app.layout = html.Div([
-    html.H1("Asbestos Abatement Dashboard"),
+    html.H1("Asbestos Abatement Dashboard", style={'text-align': 'center'}),
     dcc.Dropdown(
         id='area-dropdown',
-        options=[{'label': 'All Areas', 'value': 'All Areas'}] + [{'label': i, 'value': i} for i in fetch_data('raw_asbestos_data')['Forward Sortation Area'].unique()],
+        options=[{'label': 'All Areas', 'value': 'All Areas'}] + [{'label': i, 'value': i} for i in fetch_data('coordinates')['Forward Sortation Area'].unique()],
         value='All Areas',
         placeholder="Select a Forward Sortation Area",
         searchable=True
     ),
     dcc.Dropdown(
         id='condition-dropdown',
-        options=[{'label': condition, 'value': condition} for condition in ['Vermiculite', 'Piping', 'Drywall', 'Tiling', 'Floor Tiles', 'Ceiling Tiles', 'Insulation', 'Ducting', 'Stucco/Stipple']],
-        value='Vermiculite',
+        options=[
+            {'label': 'All Notifications', 'value': 'All Notifications'}] + 
+            [{'label': condition, 'value': condition} for condition in [
+                'Vermiculite', 'Piping', 'Drywall', 'Tiling', 'Floor Tiles', 'Ceiling Tiles', 
+                'Insulation', 'Ducting', 'Stucco/Stipple'
+            ]],
+        value='All Notifications',
         placeholder="Select Condition",
         searchable=True
     ),
-    dcc.Graph(id='area-chart'),
-    dcc.Graph(id='map-plot'),
+    dcc.Graph(id='area-chart', style={'border': '2px solid white', 'padding': '10px'}),
+    dcc.Graph(id='map-plot', style={'border': '2px solid white', 'padding': '10px'}),
     dash_table.DataTable(
-        id='pivot-table',
-        page_size=30,
-        hidden_columns=['supportDescription', 'startDate', 'endDate'],
-        style_table={'maxHeight': '300px', 'overflowY': 'auto'}
-    )
-])
+        id='pivot-table', page_size=30,
+        hidden_columns=['supportDescription', 'endDate', 'confirmationNo'], 
+        style_table={'maxHeight': '300px', 'overflowY': 'auto'},  # Adjust 'maxHeight' as needed
+        style_header={
+        'backgroundColor': 'rgb(230, 230, 230)',
+        'fontWeight': 'bold',
+        'color': 'black',
+        'border': '1px solid black',
+        'text_align': 'center'},
+        style_cell={
+        'backgroundColor': 'white',
+        'color': 'black',
+        'fontSize': 12,
+        'font-family': 'Nunito, sans-serif',
+        'textAlign': 'left',
+        'border': '1px solid grey'
+        }
+        )    
+], style={'backgroundColor': '#D3D3D3', 'padding': '10px'})
+
 
 @app.callback(
     [Output('area-chart', 'figure'), Output('map-plot', 'figure'), Output('pivot-table', 'data')],
