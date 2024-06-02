@@ -22,8 +22,9 @@ px.set_mapbox_access_token(mapbox_access_token)
 DATABASE_URL = os.environ.get('DATABASE_URL')
 if not DATABASE_URL:
     raise ValueError("DATABASE_URL environment variable not set")
+if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 engine = create_engine(DATABASE_URL)
-
 
 def fetch_data(table_name):
     """ Utility to fetch data from a specified table in the PostgreSQL database. """
