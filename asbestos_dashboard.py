@@ -130,7 +130,7 @@ app.layout = html.Div([
     html.H1("Asbestos Abatement Dashboard"),
     dcc.Dropdown(
         id='area-dropdown',
-        options=[{'label': 'All Areas', 'value': 'All Areas'}] + [{'label': i, 'value': i} for i in fetch_data('comprehensive_pivot')['Forward Sortation Area'].unique()],
+        options=[{'label': 'All Areas', 'value': 'All Areas'}] + [{'label': i, 'value': i} for i in fetch_data('raw_asbestos_data')['Forward Sortation Area'].unique()],
         value='All Areas',
         placeholder="Select a Forward Sortation Area",
         searchable=True
