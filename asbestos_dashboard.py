@@ -158,7 +158,7 @@ app.layout = html.Div([
     [Input('area-dropdown', 'value'), Input('condition-dropdown', 'value')]
 )
 def update_output(selected_area, selected_condition):
-    df = fetch_data('comprehensive_pivot')  # Fetching the comprehensive data
+    df = fetch_data('raw_asbestos_data')  # Fetching the comprehensive data
 
     chart = create_chart(df, selected_area, selected_condition)
     map_plot = create_map(df, selected_area, 'scatter')

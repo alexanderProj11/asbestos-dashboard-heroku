@@ -23,14 +23,6 @@ def process_data(file_path):
         df.to_sql('raw_asbestos_data', con=engine, if_exists='replace', index=False)
         print("raw_asbestos_data table created and populated in the database.")
 
-        # Exclude datetime columns and other non-numeric columns from the pivot table calculation
-        non_numeric_columns = ['Forward Sortation Area', 'Latitude', 'Longitude', 'startDate', 'endDate']
-        numeric_columns = [col for col in df.columns if col not in non_numeric_columns]
-
-        # Create and store the comprehensive pivot table
-        pivot_table = df.groupby('Forward Sortation Area')[numeric_columns].sum().reset_index()
-        pivot_table.to_sql('comprehensive_pivot', con=engine, if_exists='replace', index=False)
-        print("comprehensive_pivot table created and stored in the database.")
 
     except Exception as e:
         print(f"Failed to process the Excel file: {e}")
