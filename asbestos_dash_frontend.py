@@ -8,17 +8,22 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
 # Initialize the Dash app
 app = dash.Dash(__name__)
+server = app.server  # Expose the server variable for deployments
 
 # Set Mapbox token
 mapbox_access_token = os.environ.get('MAPBOX_ACCESS_TOKEN')
+if not mapbox_access_token:
+    raise ValueError("MAPBOX_ACCESS_TOKEN environment variable not set")
 px.set_mapbox_access_token(mapbox_access_token)
 
 # Database connection setup
 DATABASE_URL = os.environ.get('DATABASE_URL')
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL environment variable not set")
 engine = create_engine(DATABASE_URL)
+
 
 def fetch_data(table_name):
     """ Utility to fetch data from a specified table in the PostgreSQL database. """

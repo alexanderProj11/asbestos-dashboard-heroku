@@ -6,8 +6,10 @@ import time
 
 load_dotenv()
 
-# Establish a connection to the PostgreSQL database
+# Database connection setup
 DATABASE_URL = os.environ.get('DATABASE_URL')
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL environment variable not set")
 engine = create_engine(DATABASE_URL)
 
 def create_comprehensive_pivot_table(df, engine):
