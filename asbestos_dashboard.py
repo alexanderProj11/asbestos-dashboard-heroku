@@ -135,8 +135,7 @@ def create_map(df, selected_area):
     fig = px.scatter_mapbox(
         filtered_df,
         lat='Latitude',
-        lon='Longitude',
-        color=color,  # Coloring points based on the 'Condition' column
+        lon='Longitude',  
         hover_name='contractor',  # Main title for hover information
         hover_data=['formattedAddress', 'startDate', 'postalCode'],  # Additional data shown on hover
         color_continuous_scale=px.colors.cyclical.IceFire,  # Set the color scale
