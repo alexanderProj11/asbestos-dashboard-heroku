@@ -22,12 +22,10 @@ if not mapbox_access_token:
 px.set_mapbox_access_token(mapbox_access_token)
 
 # Database connection setup
-try:
-    DATABASE_URL = os.getenv('DATABASE_URL')
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
-    app.config['DATABASE_URL'] = DATABASE_URL
-except:
-    app.config['DATABASE_URL'] = DATABASE_URL
+
+DATABASE_URL = os.getenv('DATABASE_URL')
+DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
+
 engine = create_engine(DATABASE_URL)
 
 # Fetch data function
