@@ -10,8 +10,8 @@ load_dotenv()
 DATABASE_URL = os.environ.get('DATABASE_URL')
 if not DATABASE_URL:
     raise ValueError("DATABASE_URL environment variable not set")
-if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+
 engine = create_engine(DATABASE_URL)
 
 def create_comprehensive_pivot_table(df, engine):

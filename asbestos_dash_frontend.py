@@ -5,6 +5,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 import os
 from dotenv import load_dotenv
+import re
 
 load_dotenv()
 
@@ -19,11 +20,14 @@ if not mapbox_access_token:
 px.set_mapbox_access_token(mapbox_access_token)
 
 # Database connection setup
-DATABASE_URL = os.environ.get('DATABASE_URL')
-if not DATABASE_URL:
-    raise ValueError("DATABASE_URL environment variable not set")
-if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+# production or dev DB
+try:
+    DATABASE_URL = os.getenv('DATABASE_URL')
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
+    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+
+except:
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///MYDATABASE'
 engine = create_engine(DATABASE_URL)
 
 def fetch_data(table_name):
