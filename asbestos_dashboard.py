@@ -6,7 +6,9 @@ from sqlalchemy import create_engine
 import os
 from dotenv import load_dotenv
 import re
+import time
 
+# Load environment variables
 load_dotenv()
 
 # Initialize the Dash app
@@ -20,21 +22,27 @@ if not mapbox_access_token:
 px.set_mapbox_access_token(mapbox_access_token)
 
 # Database connection setup
-# production or dev DB
 try:
     DATABASE_URL = os.getenv('DATABASE_URL')
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
     app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
-
 except:
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///MYDATABASE'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///asbestos.db'
 engine = create_engine(DATABASE_URL)
 
+# Fetch data function
 def fetch_data(table_name):
-    """ Utility to fetch data from a specified table in the PostgreSQL database. """
     query = f'SELECT * FROM {table_name}'
     return pd.read_sql_query(query, con=engine)
 
+def create_comprehensive_pivot_table(df, engine):
+    """Creates and stores the comprehensive pivot table in the database."""
+    # Create a comprehensive pivot table, assuming aggregating with sum
+    pivot_table = df.groupby('Forward Sortation Area').sum().reset_index()
+    pivot_table.to_sql('comprehensive_pivot', con=engine, if_exists='replace', index=False)
+    print("Comprehensive pivot table created and stored in database.")
+
+# Create chart function
 def create_chart(df, selected_area, selected_condition):
     """ Generates a bar chart for the selected condition or overall notification counts. """
     # Ensure Forward Sortation Areas are sorted alphabetically
@@ -75,6 +83,23 @@ def create_chart(df, selected_area, selected_condition):
 
     fig.update_layout(showlegend=False)
     return fig
+
+
+def create_table(df):
+    """
+    Generates a DataTable from DataFrame, formatting datetime columns to show only the 
+    date.
+    """
+    # List of datetime columns to format, adjust as necessary
+    datetime_columns = ['startDate', 'endDate']
+
+    # Format each datetime column to date only
+    for col in datetime_columns:
+        if col in df.columns:
+            df[col] = pd.to_datetime(df[col]).dt.date
+
+    return df.to_dict('records')
+
 
 def create_map(df, selected_area, map_type):
     # Filtering the DataFrame based on the selected area
@@ -117,20 +142,6 @@ def create_map(df, selected_area, map_type):
     )
     return fig
 
-def create_table(df):
-    """
-    Generates a DataTable from DataFrame, formatting datetime columns to show only the 
-    date.
-    """
-    # List of datetime columns to format, adjust as necessary
-    datetime_columns = ['startDate', 'endDate']
-
-    # Format each datetime column to date only
-    for col in datetime_columns:
-        if col in df.columns:
-            df[col] = pd.to_datetime(df[col]).dt.date
-
-    return df.to_dict('records')
 
 # Layout of the application
 app.layout = html.Div([
@@ -173,7 +184,42 @@ def update_output(selected_area, selected_condition):
 
     return chart, map_plot, table_data
 
-# Run the application
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 8050))  # Get the port from the environment variable or default to 8050
-    app.run_server(debug=True, host='0.0.0.0', port=port)
+# Backend processing functions
+def process_data(file_path):
+    try:
+        df = pd.read_excel(file_path, engine='openpyxl')
+        expected_columns = ['Vermiculite', 'Piping', 'Drywall', 'Tiling', 'Floor Tiles', 'Ceiling Tiles', 'Insulation', 'Ducting', 'Stucco/Stipple', 'Forward Sortation Area', 'Latitude', 'Longitude']
+        for col in expected_columns:
+            if col not in df.columns:
+                df[col] = 0
+        df.to_sql('raw_asbestos_data', con=engine, if_exists='replace', index=False)
+        create_comprehensive_pivot_table(df, engine)
+    except Exception as e:
+        print(f"Failed to process the Excel file: {e}")
+
+def manual_update(file_path):
+    print("Manual data update triggered.")
+    process_data(file_path)
+
+def periodic_check(file_path, interval=3600):
+    while True:
+        process_data(file_path)
+        print(f"Data checked and updated at {time.ctime()}.")
+        time.sleep(interval)
+
+def main():
+    file_path = 'addresses_ALL-VALID_27-05-2024.xlsx'
+    try:
+        df = pd.read_excel(file_path, engine='openpyxl')
+        expected_columns = ['Vermiculite', 'Piping', 'Drywall', 'Tiling', 'Floor Tiles', 'Ceiling Tiles', 'Insulation', 'Ducting', 'Stucco/Stipple', 'Forward Sortation Area', 'Latitude', 'Longitude']
+        for col in expected_columns:
+            if col not in df.columns:
+                df[col] = 0
+        df.to_sql('raw_asbestos_data', con=engine, if_exists='replace', index=False)
+        create_comprehensive_pivot_table(df, engine)
+    except Exception as e:
+        print(f"Failed to process the Excel file: {e}")
+
+if __name__ == "__main__":
+    main()
+    app.run_server(debug=True)
