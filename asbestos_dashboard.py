@@ -121,14 +121,8 @@ def create_map(df, selected_area):
     Returns:
         plotly.graph_objs._figure.Figure: A figure object containing the map.
     """
-    # Filtering the DataFrame based on the selected area
-    filtered_df = df if selected_area == "All Areas" else df[df['Forward Sortation Area'] == selected_area]
+    filtered_df = df
 
-    # Debugging: Print filtered data to ensure it's not empty and coordinates are present
-    print(filtered_df[['Latitude', 'Longitude']].dropna())
-
-    # Define the color scale based on a condition if present
-    color = 'Condition' if 'Condition' in df.columns else None
 
     # Checking if there are any coordinates to plot
     if filtered_df[['Latitude', 'Longitude']].dropna().empty:
@@ -163,13 +157,6 @@ def create_map(df, selected_area):
 # Layout of the application
 app.layout = html.Div([
     html.H1("Asbestos Abatement Dashboard", style={'text-align': 'center'}),
-    dcc.Dropdown(
-        id='area-dropdown',
-        options=[{'label': 'All Areas', 'value': 'All Areas'}] + [{'label': i, 'value': i} for i in fetch_data('raw_asbestos_data')['Forward Sortation Area'].dropna().unique()],
-        value='All Areas',
-        placeholder="Select a Forward Sortation Area",
-        searchable=True
-    ),
     dcc.Dropdown(
         id='condition-dropdown',
         options=[
