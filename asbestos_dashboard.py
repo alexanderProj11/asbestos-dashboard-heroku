@@ -95,7 +95,6 @@ def create_map(df, selected_area):
         filtered_df,
         lat='Latitude',
         lon='Longitude',
-        color='Condition',  # Assuming you have a 'Condition' column to color points
         hover_name='contractor',
         hover_data={'formattedAddress': True, 'startDate': True, 'postalCode': True, 'Latitude': False, 'Longitude': False},
         color_continuous_scale=px.colors.cyclical.IceFire,
