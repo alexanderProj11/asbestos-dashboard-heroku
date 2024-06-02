@@ -147,7 +147,7 @@ def update_output(selected_area, selected_condition):
     df = fetch_data('raw_asbestos_data')
 
     chart = create_chart(df, selected_area, selected_condition)
-    map_plot = create_map(df, selected_area, 'scatter')
+    map_plot = create_map(df, selected_area)
     table_data = create_table(df)
 
     return chart, map_plot, table_data
