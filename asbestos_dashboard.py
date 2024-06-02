@@ -82,33 +82,40 @@ def create_map(df, selected_area):
         return px.scatter_mapbox(title="No data available")
 
     # Filter the DataFrame based on the selected area
-    filtered_df = df if selected_area == "All Areas" else df[df['Forward Sortation Area'] == selected_area]
-
-    # Determine the center for map focusing
-    if not filtered_df.empty:
-        center = {"lat": filtered_df['Latitude'].mean(), "lon": filtered_df['Longitude'].mean()}
+    if selected_area == "All Areas":
+        filtered_df = df
     else:
-        center = {"lat": 0, "lon": 0}
+        filtered_df = df[df['Forward Sortation Area'] == selected_area]
+
+    # Check if the DataFrame is still empty after filtering
+    if filtered_df.empty:
+        return px.scatter_mapbox(title="No data available for the selected area")
+
+    # Set the center of the map based on the median latitude and longitude of the filtered data
+    center_lat = filtered_df['Latitude'].median()
+    center_lon = filtered_df['Longitude'].median()
 
     # Create the scatter mapbox plot
     fig = px.scatter_mapbox(
         filtered_df,
         lat='Latitude',
         lon='Longitude',
+        color='Condition',  # Assuming you have a 'Condition' column to color points
         hover_name='contractor',
         hover_data={'formattedAddress': True, 'startDate': True, 'postalCode': True, 'Latitude': False, 'Longitude': False},
         color_continuous_scale=px.colors.cyclical.IceFire,
         size_max=15,
-        zoom=10 if selected_area == "All Areas" else 12,
-        center=center
+        zoom=10,
+        center={"lat": center_lat, "lon": center_lon}
     )
 
-    # Common map settings
+    # Update layout settings
     fig.update_layout(
         mapbox_style="streets",
         mapbox_accesstoken=mapbox_access_token,
         margin={"r": 0, "t": 0, "l": 0, "b": 0}
     )
+
     return fig
 
 # Layout of the application
