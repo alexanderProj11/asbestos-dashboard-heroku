@@ -22,7 +22,6 @@ if not mapbox_access_token:
 px.set_mapbox_access_token(mapbox_access_token)
 
 # Database connection setup
-
 DATABASE_URL = os.getenv('DATABASE_URL')
 DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
 
@@ -82,7 +81,6 @@ def create_chart(df, selected_area, selected_condition):
     fig.update_layout(showlegend=False)
     return fig
 
-
 def create_table(df):
     """
     Generates a DataTable from DataFrame, formatting datetime columns to show only the 
@@ -97,7 +95,6 @@ def create_table(df):
             df[col] = pd.to_datetime(df[col]).dt.date
 
     return df.to_dict('records')
-
 
 def create_map(df, selected_area, map_type):
     # Filtering the DataFrame based on the selected area
@@ -139,7 +136,6 @@ def create_map(df, selected_area, map_type):
         margin={"r":0, "t":0, "l":0, "b":0}
     )
     return fig
-
 
 # Layout of the application
 app.layout = html.Div([
