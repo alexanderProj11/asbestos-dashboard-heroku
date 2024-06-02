@@ -90,7 +90,6 @@ def create_map(df, selected_area, map_type):
             filtered_df,
             lat='Latitude',
             lon='Longitude',
-            color='Condition',
             hover_name='contractor',
             hover_data=['formattedAddress', 'startDate', 'postalCode'],
             color_continuous_scale=px.colors.cyclical.IceFire,
