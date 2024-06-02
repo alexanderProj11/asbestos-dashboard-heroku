@@ -15,11 +15,6 @@ def process_data(file_path):
     try:
         df = pd.read_excel(file_path, engine='openpyxl')
 
-        expected_columns = ['Vermiculite', 'Piping', 'Drywall', 'Tiling', 'Floor Tiles', 'Ceiling Tiles', 'Insulation', 'Ducting', 'Stucco/Stipple', 'Forward Sortation Area', 'Latitude', 'Longitude']
-        for col in expected_columns:
-            if col not in df.columns:
-                df[col] = 0
-
         df.to_sql('raw_asbestos_data', con=engine, if_exists='replace', index=False)
         print("raw_asbestos_data table created and populated in the database.")
 
