@@ -22,7 +22,7 @@ def create_engine_and_tables(file_path, database_url):
     ]
     
     data_table_columns = [
-        'confirmationNo', 'formattedAddress', 'owner', 'contractor', 'Vermiculite',
+        'confirmationNo', 'formattedAddress', 'supportDescription', 'owner', 'contractor', 'Vermiculite',
         'Piping', 'Drywall', 'Insulation', 'Tiling', 'Floor_Tiles', 'Ceiling_Tiles',
         'Ducting', 'Plaster', 'Stucco_Stipple', 'Fittings'
     ]
