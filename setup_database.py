@@ -28,7 +28,7 @@ def create_engine_and_tables(file_path, database_url):
     ]
     
     chart_table_columns = [
-        'Forward_Sortation_Area', 'confirmationNo', 'Vermiculite', 'Piping', 'Drywall',
+        'Forward_Sortation_Area', 'startDate', 'confirmationNo', 'Vermiculite', 'Piping', 'Drywall',
         'Insulation', 'Tiling', 'Floor_Tiles', 'Ceiling_Tiles', 'Ducting', 'Plaster',
         'Stucco_Stipple', 'Fittings'
     ]
