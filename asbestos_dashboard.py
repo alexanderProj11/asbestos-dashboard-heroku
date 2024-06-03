@@ -37,7 +37,7 @@ def fetch_data(table_name):
 # Create chart function
 def create_chart(df, selected_area, selected_condition):
     """Generates a bar chart for the selected condition or overall notification counts."""
-    df = df.sort_values('Forward_Sortation_Area').copy()
+    df = df.sort_values('Forward_Sortation_Area')
 
     if selected_condition != "All Conditions" and selected_condition not in df.columns:
         df[selected_condition] = 0
@@ -52,36 +52,42 @@ def create_chart(df, selected_area, selected_condition):
         condition_counts = df[df[selected_condition] == 1].groupby('Forward_Sortation_Area').size().reset_index(name='Condition Counts')
         total_counts = df.groupby('Forward_Sortation_Area').size().reset_index(name='Total Counts')
         count_df = pd.merge(total_counts, condition_counts, on='Forward_Sortation_Area', how='left')
-        count_df['Condition Counts'] = count_df['Condition Counts'].fillna(0)
+        count_df['Condition Counts'].fillna(0, inplace=True)
         count_df['Condition Percentage'] = (count_df['Condition Counts'] / count_df['Total Counts']) * 100
 
     if selected_area not in count_df['Forward_Sortation_Area'].values and selected_area != "All Areas":
         return px.bar(title="No data available for the selected area")
 
-    title_text = "Total Notifications per Area" if selected_condition in ["All Notifications", "All Conditions"] else f"Percentage of {selected_condition} per Area"
-    
-    if selected_condition == "All Notifications":
-        area_value = count_df.loc[count_df['Forward_Sortation_Area'] == selected_area, 'Counts']
-    elif selected_condition == "All Conditions":
-        area_value = count_df.loc[count_df['Forward_Sortation_Area'] == selected_area, 'Counts']
+    if selected_area == "All Areas":
+        if selected_condition == "All Conditions":
+            title_text = "Total Notifications per Area"
+        elif selected_condition == "Vermiculite":
+            title_text = "Percentage of Time Vermiculite is Found by Area"
+        else:
+            title_text = f"Percentage where Asbestos found in {selected_condition} by Area"
     else:
-        area_value = count_df.loc[count_df['Forward_Sortation_Area'] == selected_area, 'Condition Percentage']
-    
-    if not area_value.empty:
-        area_value = area_value.iloc[0]
-    else:
-        area_value = 0
-    
-    title = f"{title_text} for {selected_area}: {area_value}"
+        if selected_condition == "All Conditions":
+            area_value = count_df.loc[count_df['Forward_Sortation_Area'] == selected_area, 'Counts']
+            area_value = area_value.iloc[0] if not area_value.empty else 0
+            title_text = f"Total Notifications in {selected_area}: {area_value}"
+        elif selected_condition == "Vermiculite":
+            area_value = count_df.loc[count_df['Forward_Sortation_Area'] == selected_area, 'Condition Percentage']
+            area_value = round(area_value.iloc[0], 2) if not area_value.empty else 0
+            title_text = f"Percentage where Vermiculite is Found for {selected_area}: {area_value}%"
+        else:
+            area_value = count_df.loc[count_df['Forward_Sortation_Area'] == selected_area, 'Condition Percentage']
+            area_value = round(area_value.iloc[0], 2) if not area_value.empty else 0
+            title_text = f"Percentage where Asbestos is Found in {selected_condition} in {selected_area}: {area_value}%"
 
     count_df['Highlight'] = count_df['Forward_Sortation_Area'].apply(lambda x: 'Selected' if x == selected_area else 'Other')
     color_discrete_map = {'Selected': 'red', 'Other': 'blue'}
 
     fig = px.bar(count_df, x='Forward_Sortation_Area', y='Counts' if selected_condition in ["All Notifications", "All Conditions"] else 'Condition Percentage',
-                 title=title, color='Highlight', color_discrete_map=color_discrete_map)
+                 title=title_text, color='Highlight', color_discrete_map=color_discrete_map, hover_name='Forward_Sortation_Area')
 
     fig.update_layout(showlegend=False)
     return fig
+
 
 def create_table(df, selected_condition):
     """Generates a DataTable from DataFrame, formatting datetime columns to show only the date."""
@@ -92,7 +98,7 @@ def create_table(df, selected_condition):
 
     for col in datetime_columns:
         if col in df.columns:
-            df[col] = pd.to_datetime(df[col]).dt.date
+            df.loc[:, col] = pd.to_datetime(df[col]).dt.date
 
     return df.to_dict('records')
 
@@ -102,7 +108,7 @@ def create_map(df, selected_area, selected_condition):
 
     # Filter rows based on selected condition
     if selected_condition != "All Conditions":
-        filtered_df = df[df[selected_condition] == 1].copy()  
+        filtered_df = df[df[selected_condition] == 1].copy()
     else:
         filtered_df = df.copy()
 
@@ -113,17 +119,14 @@ def create_map(df, selected_area, selected_condition):
     if filtered_df.empty:
         return px.scatter_mapbox(title="No data available for the selected area")
 
-    # Ensure that Latitude and Longitude columns are numeric
-    filtered_df['Latitude'] = pd.to_numeric(filtered_df['Latitude'], errors='coerce')
-    filtered_df['Longitude'] = pd.to_numeric(filtered_df['Longitude'], errors='coerce')
+    filtered_df.loc[:, 'Latitude'] = pd.to_numeric(filtered_df['Latitude'], errors='coerce')
+    filtered_df.loc[:, 'Longitude'] = pd.to_numeric(filtered_df['Longitude'], errors='coerce')
 
-    # Drop rows with invalid Latitude or Longitude values
     filtered_df = filtered_df.dropna(subset=['Latitude', 'Longitude'])
 
     if filtered_df.empty:
         return px.scatter_mapbox(title="No valid geospatial data available")
 
-    # Determine center for map focusing
     center = {
         "lat": filtered_df['Latitude'].median(),
         "lon": filtered_df['Longitude'].median()
@@ -197,10 +200,11 @@ app.layout = html.Div(
                 dash_table.DataTable(
                     id='pivot-table',
                     page_size=30,
-                    hidden_columns=['supportDescription', 'inputAddress', 'endDate', 'verdict', 'Forward_Sortation_Area', 'Latitude', 'Longitude', 'postalCode', 'siteContact', 'contactPhoneNumber', 'errorMessage', 'submittedDate', 'owner', 'ownerPhoneNumber', 'compName', 'compPhoneNumber'],
+                    hidden_columns=['supportDescription', 'startDate', 'endDate'],
                     style_table={'maxHeight': '300px', 'overflowY': 'auto'},
                     style_header={'backgroundColor': 'white', 'color': 'black', 'fontWeight': 'bold'},  # Bold column headers
-                    style_cell={'backgroundColor': '#d3d3d3', 'color': 'black'}
+                    style_cell={'backgroundColor': 'white', 'color': 'black'},
+                    style_as_list_view=True,
                 )
             ]
         )
