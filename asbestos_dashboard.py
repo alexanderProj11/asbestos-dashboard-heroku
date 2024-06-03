@@ -120,18 +120,33 @@ def create_map(df, selected_area, selected_condition):
     if filtered_df.empty:
         return px.scatter_mapbox(title="No data available for the selected area")
 
-    filtered_df.loc[:, 'Latitude'] = pd.to_numeric(filtered_df['Latitude'], errors='coerce')
-    filtered_df.loc[:, 'Longitude'] = pd.to_numeric(filtered_df['Longitude'], errors='coerce')
+    # Ensure that Latitude and Longitude columns are numeric
+    filtered_df['Latitude'] = pd.to_numeric(filtered_df['Latitude'], errors='coerce')
+    filtered_df['Longitude'] = pd.to_numeric(filtered_df['Longitude'], errors='coerce')
 
+    # Drop rows with invalid Latitude or Longitude values
     filtered_df = filtered_df.dropna(subset=['Latitude', 'Longitude'])
 
     if filtered_df.empty:
         return px.scatter_mapbox(title="No valid geospatial data available")
 
+    # Determine center for map focusing
     center = {
         "lat": filtered_df['Latitude'].median(),
         "lon": filtered_df['Longitude'].median()
     }
+
+    # Determine the title for the map based on selected area and condition
+    if selected_area == "All Areas":
+        if selected_condition == "All Conditions":
+            map_title = "All Areas - All Conditions"
+        else:
+            map_title = f"All Areas - {selected_condition}"
+    else:
+        if selected_condition == "All Conditions":
+            map_title = f"{selected_area} - All Conditions"
+        else:
+            map_title = f"{selected_area} - {selected_condition}"
 
     fig = px.scatter_mapbox(
         filtered_df,
@@ -141,7 +156,8 @@ def create_map(df, selected_area, selected_condition):
         hover_data=['formattedAddress', 'startDate', 'postalCode'],
         size_max=15,
         zoom=10 if selected_area == "All Areas" else 12,
-        center=center
+        center=center,
+        title=map_title
     )
 
     fig.update_layout(
@@ -151,6 +167,7 @@ def create_map(df, selected_area, selected_condition):
     )
 
     return fig
+
 
 # Layout of the application with CSS styling
 app.layout = html.Div(
