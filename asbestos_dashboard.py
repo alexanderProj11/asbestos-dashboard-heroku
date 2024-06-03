@@ -37,7 +37,7 @@ def fetch_data(table_name):
 # Create chart function
 def create_chart(df, selected_area, selected_condition):
     """Generates a bar chart for the selected condition or overall notification counts."""
-    df = df.sort_values('Forward_Sortation_Area')
+    df = df.sort_values('Forward_Sortation_Area').copy()
 
     if selected_condition != "All Conditions" and selected_condition not in df.columns:
         df[selected_condition] = 0
@@ -52,7 +52,7 @@ def create_chart(df, selected_area, selected_condition):
         condition_counts = df[df[selected_condition] == 1].groupby('Forward_Sortation_Area').size().reset_index(name='Condition Counts')
         total_counts = df.groupby('Forward_Sortation_Area').size().reset_index(name='Total Counts')
         count_df = pd.merge(total_counts, condition_counts, on='Forward_Sortation_Area', how='left')
-        count_df['Condition Counts'].fillna(0, inplace=True)
+        count_df['Condition Counts'] = count_df['Condition Counts'].fillna(0)
         count_df['Condition Percentage'] = (count_df['Condition Counts'] / count_df['Total Counts']) * 100
 
     if selected_area not in count_df['Forward_Sortation_Area'].values and selected_area != "All Areas":
@@ -87,6 +87,7 @@ def create_chart(df, selected_area, selected_condition):
 
     fig.update_layout(showlegend=False)
     return fig
+
 
 
 def create_table(df, selected_condition):
