@@ -87,6 +87,7 @@ def create_chart(df, selected_area, selected_condition):
     
     # Update bar borders to be black
     fig.update_traces(marker_line_color='black', marker_line_width=1.0)
+    
     fig.update_layout(showlegend=False)
     return fig
 
