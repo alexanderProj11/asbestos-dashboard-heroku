@@ -84,7 +84,9 @@ def create_chart(df, selected_area, selected_condition):
 
     fig = px.bar(count_df, x='Forward_Sortation_Area', y='Counts' if selected_condition in ["All Notifications", "All Conditions"] else 'Condition Percentage',
                  title=title_text, color='Highlight', color_discrete_map=color_discrete_map, hover_name='Forward_Sortation_Area')
-
+    
+    # Update bar borders to be black
+    fig.update_traces(marker_line_color='black', marker_line_width=1.0)
     fig.update_layout(showlegend=False)
     return fig
 
