@@ -221,8 +221,8 @@ app.layout = html.Div(
                     id='pivot-table',
                     page_size=30,
                     style_table={'maxHeight': '300px', 'overflowY': 'auto'},
-                    style_header={'backgroundColor': 'white', 'color': 'black', 'fontWeight': 'bold'},  # Bold column headers
-                    style_cell={'backgroundColor': 'white', 'color': 'black'},
+                    style_header={'backgroundColor': 'white', 'color': 'black', 'fontWeight': 'bold', 'textAlign': 'left', 'fontSize': '18px'},  # Bold column headers
+                    style_cell={'backgroundColor': 'white', 'color': 'black', 'border': '1px solid lightgrey', 'textAlign': 'left'},
                     style_as_list_view=True,
                 )
             ]
