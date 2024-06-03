@@ -223,11 +223,9 @@ app.layout = html.Div(
                     style_table={'maxHeight': '300px', 'overflowY': 'auto'},
                     style_header={'backgroundColor': 'white', 'color': 'black', 'fontWeight': 'bold', 'textAlign': 'left', 'fontSize': '16px'},  # Bold column headers
                     style_cell={'backgroundColor': 'white', 'color': 'black', 
-                                'border-left': '1px solid lightgrey',  # Light grey vertical gridlines
-                                'border-right': '1px solid lightgrey',  # Light grey vertical gridlines
-                                'border-bottom': '1px solid lightgrey',  # Light grey horizontal gridlines 
+                                'border': '2px solid lightgrey', 
                                 'textAlign': 'left'},
-                    style_as_list_view=True,
+                    style_as_list_view=False,
                 )
             ]
         )
