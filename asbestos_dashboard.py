@@ -279,7 +279,7 @@ def trigger_scale_up():
         print(f"Failed to scale up dynos: {response.text}")
 
 # Trigger scale up on initial page load
-@server.before_first_request
+@app.server.before_first_request
 def before_first_request():
     trigger_scale_up()
 
