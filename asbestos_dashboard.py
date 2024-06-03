@@ -89,7 +89,6 @@ def create_chart(df, selected_area, selected_condition):
     return fig
 
 
-
 def create_table(df, selected_condition):
     """Generates a DataTable from DataFrame, formatting datetime columns to show only the date."""
     if selected_condition != "All Conditions":
@@ -99,7 +98,7 @@ def create_table(df, selected_condition):
 
     for col in datetime_columns:
         if col in df.columns:
-            df.loc[:, col] = pd.to_datetime(df[col]).dt.date
+            df[col] = pd.to_datetime(df[col]).dt.date
 
     return df.to_dict('records')
 
