@@ -5,6 +5,9 @@ import pandas as pd
 from sqlalchemy import create_engine
 import os
 from dotenv import load_dotenv
+from flask import Flask, request, jsonify
+import subprocess
+import requests
 
 # Load environment variables
 load_dotenv()
@@ -23,7 +26,12 @@ px.set_mapbox_access_token(mapbox_access_token)
 DATABASE_URL = os.getenv('DATABASE_URL')
 DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
 
-engine = create_engine(DATABASE_URL)
+engine = create_engine(
+    DATABASE_URL, 
+    pool_timeout=30,           # Timeout to get a connection from the pool
+    pool_recycle=3600,         # Recycle connections every hour
+    pool_pre_ping=True,        # Test connection for liveness)
+)
 
 # Fetch data function
 def fetch_data(table_name):
@@ -248,6 +256,32 @@ def update_output(selected_area, selected_condition):
     table_data = create_table(df_table, selected_condition)
 
     return chart, map_plot, table_data
+
+# Add a route to scale up the dynos
+@server.route('/scale_up', methods=['POST'])
+def scale_up():
+    secret_token = request.headers.get('Authorization')
+    if secret_token != os.getenv('SCALE_UP_SECRET_TOKEN'):
+        return jsonify({"error": "Unauthorized"}), 401
+
+    # Run the scale_up.sh script
+    result = subprocess.run(['./scale_up.sh'], capture_output=True, text=True)
+    return result.stdout, 200
+
+# Function to trigger scale up
+def trigger_scale_up():
+    url = 'https://asbestos-dashboard-2121da576ef0.herokuapp.com/scale_up'
+    headers = {'Authorization': os.getenv('SCALING_ACCESS_TOKEN')}
+    response = requests.post(url, headers=headers)
+    if response.status_code == 200:
+        print("Dynos scaled up successfully.")
+    else:
+        print(f"Failed to scale up dynos: {response.text}")
+
+# Trigger scale up on initial page load
+@server.before_first_request
+def before_first_request():
+    trigger_scale_up()
 
 if __name__ == "__main__":
     app.run_server(debug=True)
