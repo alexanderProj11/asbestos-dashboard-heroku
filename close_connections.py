@@ -23,7 +23,7 @@ def close_active_connections():
             SELECT pg_terminate_backend(pid)
             FROM pg_stat_activity
             WHERE datname = 'postgresql-infinite-47162'
-            AND leader_pid IS NULL;
+                AND leader_pid IS NULL;
         """)
 
         # Execute the query
