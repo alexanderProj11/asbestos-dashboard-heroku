@@ -20,10 +20,10 @@ def close_active_connections():
 
         # Query to find and terminate active connections
         query = sql.SQL("""
-            SELECT pg_terminate_backend(pg_stat_activity.pid)
+            SELECT pg_terminate_backend(pid)
             FROM pg_stat_activity
-            WHERE pg_stat_activity.datname = current_database()
-            AND pid <> pg_backend_pid();
+            WHERE datname = 'postgresql-infinite-47162'
+            AND leader_pid IS NULL;
         """)
 
         # Execute the query
