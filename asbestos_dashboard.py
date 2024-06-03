@@ -217,7 +217,7 @@ app.layout = html.Div(
                 dash_table.DataTable(
                     id='pivot-table',
                     page_size=30,
-                    hidden_columns=['supportDescription', 'startDate', 'endDate'],
+                    hidden_columns=['Forward_Sortation_Area', 'supportDescription', 'endDate', 'inputAddress', 'verdict', 'Latitude', 'Longitude', 'postalCode', 'errorMessage', 'submittedDate', 'ownerPhoneNumber', 'siteContact', 'contactPhoneNumber', 'compName', 'compPhoneNumber'],
                     style_table={'maxHeight': '300px', 'overflowY': 'auto'},
                     style_header={'backgroundColor': 'white', 'color': 'black', 'fontWeight': 'bold'},  # Bold column headers
                     style_cell={'backgroundColor': 'white', 'color': 'black'},
