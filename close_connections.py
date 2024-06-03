@@ -12,7 +12,7 @@ def close_active_connections():
         # Connect to your PostgreSQL database
         DATABASE_URL = os.getenv('DATABASE_URL')
         DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
-        conn = psycopg2.connect(os.getenv(DATABASE_URL))
+        conn = psycopg2.connect(DATABASE_URL)
         conn.autocommit = True  # Ensure the connection can execute termination commands
 
         # Open a cursor to perform database operations
