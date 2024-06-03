@@ -172,7 +172,7 @@ app.layout = html.Div(
                 dcc.Dropdown(
                     id='condition-dropdown',
                     options=[{'label': 'All Conditions', 'value': 'All Conditions'}] + [{'label': condition, 'value': condition} for condition in ['Vermiculite', 'Piping', 'Drywall', 'Insulation', 'Tiling', 'Floor_Tiles', 'Ceiling_Tiles', 'Ducting', 'Plaster', 'Stucco_Stipple', 'Fittings']],
-                    value='Vermiculite',
+                    value='All Conditions',
                     placeholder="Select Condition",
                     searchable=True,
                     style={'backgroundColor': 'white', 'color': 'black'}
@@ -197,7 +197,7 @@ app.layout = html.Div(
                 dash_table.DataTable(
                     id='pivot-table',
                     page_size=30,
-                    hidden_columns=['supportDescription', 'startDate', 'endDate'],
+                    hidden_columns=['supportDescription', 'inputAddress', 'endDate', 'verdict', 'Forward_Sortation_Area', 'Latitude', 'Longitude', 'postalCode', 'siteContact', 'contactPhoneNumber', 'errorMessage', 'submittedDate', 'owner', 'ownerPhoneNumber', 'compName', 'compPhoneNumber'],
                     style_table={'maxHeight': '300px', 'overflowY': 'auto'},
                     style_header={'backgroundColor': 'white', 'color': 'black', 'fontWeight': 'bold'},  # Bold column headers
                     style_cell={'backgroundColor': '#d3d3d3', 'color': 'black'}
