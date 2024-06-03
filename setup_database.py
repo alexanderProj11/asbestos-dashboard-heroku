@@ -16,13 +16,13 @@ def create_engine_and_tables(file_path, database_url):
 
     # Define the columns for each table
     map_table_columns = [
-        'Forward_Sortation_Area', 'confirmationNo', 'Latitude', 'Longitude', 'formattedAddress',
+        'Forward_Sortation_Area', 'confirmationNo', 'startDate', 'endDate', 'Latitude', 'Longitude', 'formattedAddress',
         'postalCode', 'owner', 'contractor', 'Vermiculite', 'Piping', 'Drywall', 'Insulation',
         'Tiling', 'Floor_Tiles', 'Ceiling_Tiles', 'Ducting', 'Plaster', 'Stucco_Stipple', 'Fittings'
     ]
     
     data_table_columns = [
-        'confirmationNo', 'formattedAddress', 'supportDescription', 'owner', 'contractor', 'Vermiculite',
+        'confirmationNo', 'startDate', 'endDate','formattedAddress', 'supportDescription', 'owner', 'contractor', 'Vermiculite',
         'Piping', 'Drywall', 'Insulation', 'Tiling', 'Floor_Tiles', 'Ceiling_Tiles',
         'Ducting', 'Plaster', 'Stucco_Stipple', 'Fittings'
     ]

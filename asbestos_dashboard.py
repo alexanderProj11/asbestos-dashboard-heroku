@@ -220,7 +220,6 @@ app.layout = html.Div(
                 dash_table.DataTable(
                     id='pivot-table',
                     page_size=30,
-                    hidden_columns=['Forward_Sortation_Area', 'supportDescription', 'endDate', 'inputAddress', 'verdict', 'Latitude', 'Longitude', 'postalCode', 'errorMessage', 'submittedDate', 'ownerPhoneNumber', 'siteContact', 'contactPhoneNumber', 'compName', 'compPhoneNumber'],
                     style_table={'maxHeight': '300px', 'overflowY': 'auto'},
                     style_header={'backgroundColor': 'white', 'color': 'black', 'fontWeight': 'bold'},  # Bold column headers
                     style_cell={'backgroundColor': 'white', 'color': 'black'},
@@ -237,11 +236,14 @@ app.layout = html.Div(
     [Input('area-dropdown', 'value'), Input('condition-dropdown', 'value')]
 )
 def update_output(selected_area, selected_condition):
-    df = fetch_data('asbestos_data')
+    # df = fetch_data('asbestos_data') --- Used?
+    df_map = fetch_data('map_table')
+    df_chart = fetch_data('chart_table')
+    df_table = fetch_data('data_table')
 
-    chart = create_chart(df, selected_area, selected_condition)
-    map_plot = create_map(df, selected_area, selected_condition)
-    table_data = create_table(df, selected_condition)
+    chart = create_chart(df_chart, selected_area, selected_condition)
+    map_plot = create_map(df_map, selected_area, selected_condition)
+    table_data = create_table(df_table, selected_condition)
 
     return chart, map_plot, table_data
 
