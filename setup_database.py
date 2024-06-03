@@ -6,20 +6,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def read_excel_file(file_path):
-    # Read the Excel file into a DataFrame
-    return pd.read_excel(file_path)
-
-def create_tables(conn):
-    # Cursor to execute database operations
-    cur = conn.cursor()
-    
-    # SQL commands to create each table
-    commands = [
-        """
-        CREATE TABLE IF NOT EXISTS raw_asbestos_data (
+def create_table(conn):
+    """Create a single table in the PostgreSQL database."""
+    command = """
+        CREATE TABLE IF NOT EXISTS asbestos_data (
             Forward_Sortation_Area VARCHAR(255),
             confirmationNo VARCHAR(255),
+            inputAddress VARCHAR(255),
+            verdict VARCHAR(255),
             Latitude DOUBLE PRECISION,
             Longitude DOUBLE PRECISION,
             formattedAddress VARCHAR(255),
@@ -48,147 +42,41 @@ def create_tables(conn):
             Plaster BOOLEAN,
             Stucco_Stipple BOOLEAN,
             Fittings BOOLEAN
-        );""",
-        """
-        CREATE TABLE IF NOT EXISTS map_table (
-            Forward_Sortation_Area VARCHAR(255),
-            confirmationNo VARCHAR(255),
-            Latitude DOUBLE PRECISION,
-            Longitude DOUBLE PRECISION,
-            formattedAddress VARCHAR(255),
-            postalCode VARCHAR(255),
-            startDate DATE,
-            contractor VARCHAR(255),
-            Vermiculite BOOLEAN,
-            Piping BOOLEAN,
-            Drywall BOOLEAN,
-            Insulation BOOLEAN,
-            Tiling BOOLEAN,
-            Floor_Tiles BOOLEAN,
-            Ceiling_Tiles BOOLEAN,
-            Ducting BOOLEAN,
-            Plaster BOOLEAN,
-            Stucco_Stipple BOOLEAN,
-            Fittings BOOLEAN
-        );""",
-        """
-        CREATE TABLE IF NOT EXISTS data_table (
-            Forward_Sortation_Area VARCHAR(255),
-            confirmationNo VARCHAR(255),
-            Latitude DOUBLE PRECISION,
-            Longitude DOUBLE PRECISION,
-            formattedAddress VARCHAR(255),
-            postalCode VARCHAR(255),
-            startDate DATE,
-            contractor VARCHAR(255),
-            Vermiculite BOOLEAN,
-            Piping BOOLEAN,
-            Drywall BOOLEAN,
-            Insulation BOOLEAN,
-            Tiling BOOLEAN,
-            Floor_Tiles BOOLEAN,
-            Ceiling_Tiles BOOLEAN,
-            Ducting BOOLEAN,
-            Plaster BOOLEAN,
-            Stucco_Stipple BOOLEAN,
-            Fittings BOOLEAN
-        );""",
-        """
-        CREATE TABLE IF NOT EXISTS chart_table (
-            Forward_Sortation_Area VARCHAR(255),
-            confirmationNo VARCHAR(255),
-            Latitude DOUBLE PRECISION,
-            Longitude DOUBLE PRECISION,
-            formattedAddress VARCHAR(255),
-            contractor VARCHAR(255),
-            Vermiculite BOOLEAN,
-            Piping BOOLEAN,
-            Drywall BOOLEAN,
-            Insulation BOOLEAN,
-            Tiling BOOLEAN,
-            Floor_Tiles BOOLEAN,
-            Ceiling_Tiles BOOLEAN,
-            Ducting BOOLEAN,
-            Plaster BOOLEAN,
-            Stucco_Stipple BOOLEAN,
-            Fittings BOOLEAN
-        );"""
-    ]
-
-    for command in commands:
-        cur.execute(command)
-
-    # Commit changes and close the connection
+        );
+    """
+    cur = conn.cursor()
+    cur.execute(command)
     conn.commit()
     cur.close()
 
-def insert_data(df, table_name, engine):
-    # Insert data into the table
-    df.to_sql(table_name, engine, if_exists='append', index=False)
+def insert_data(df, engine):
+    """Insert data into the specified table."""
+    df.to_sql('asbestos_data', engine, if_exists='append', index=False)
+
+def query_data(conn):
+    """Query and print data from the specified table to verify correctness."""
+    cur = conn.cursor()
+    cur.execute('SELECT "confirmationNo", "latitude", "longitude" FROM "asbestos_data"')
+    rows = cur.fetchall()
+    print("Data from asbestos_data:")
+    for row in rows:
+        print(f"ConfirmationNo: {row[0]}, Latitude: {row[1]}, Longitude: {row[2]}")
+    cur.close()
 
 def main():
-    # Database URL from the environment variables provided by Heroku
+    """Main function to handle workflow."""
     DATABASE_URL = os.getenv("DATABASE_URL")
-
-    # Connect to the PostgreSQL database server using the Heroku URL
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-    
-    # Create tables
-    create_tables(conn)
-    
-    # Close the connection
-    conn.close()
+    create_table(conn)
 
-    # Create SQLAlchemy engine
     engine = create_engine(DATABASE_URL)
+    file_path = 'all_Valid_Addresses.csv'
+    df = pd.read_csv(file_path)
 
-    # Path to your Excel file
-    file_path = 'addresses_ALL-VALID_27-05-2024.xlsx'
-    
-    # Read Excel file
-    df = read_excel_file(file_path)
+    insert_data(df, engine)
+    query_data(conn)
 
-    # Prepare and insert data into each table
-    # Adjust DataFrame for 'raw_asbestos_data'
-    df_raw_asbestos_data = df[
-        [column for column in df.columns if column in {
-            'Forward_Sortation_Area', 'confirmationNo', 'inputAddress', 'verdict',
-            'Latitude', 'Longitude', 'formattedAddress', 'postalCode', 'errorMessage',
-            'supportDescription', 'riskType', 'submittedDate', 'startDate', 'endDate',
-            'owner', 'ownerPhoneNumber', 'contractor', 'siteContact', 'contactPhoneNumber',
-            'compName', 'compPhoneNumber', 'Vermiculite', 'Piping', 'Drywall', 'Insulation',
-            'Tiling', 'Floor_Tiles', 'Ceiling_Tiles', 'Ducting', 'Plaster', 'Stucco_Stipple',
-            'Fittings'
-        }]
-    ].copy()
-
-    df_data_table = df[
-        [column for column in df.columns if column in {'Forward_Sortation_Area', 'confirmationNo', 'Latitude', 'Longitude',
-        'formattedAddress', 'postalCode', 'startDate', 'contractor', 'Vermiculite',
-        'Piping', 'Drywall', 'Insulation', 'Tiling', 'Floor_Tiles', 'Ceiling_Tiles',
-        'Ducting', 'Plaster', 'Stucco_Stipple', 'Fittings'}]
-    ].copy()
-
-    df_chart_table = df[
-        [column for column in df.columns if column in {'Forward_Sortation_Area', 'confirmationNo', 'Latitude', 'Longitude',
-        'formattedAddress', 'contractor', 'Vermiculite', 'Piping', 'Drywall',
-        'Insulation', 'Tiling', 'Floor_Tiles', 'Ceiling_Tiles', 'Ducting', 'Plaster',
-        'Stucco_Stipple', 'Fittings'}]
-    ].copy()
-
-    # Example for 'map_table'
-    df_map_table = df[
-        [column for column in df.columns if column in {'Forward_Sortation_Area', 'confirmationNo', 'Latitude', 'Longitude',
-        'formattedAddress', 'postalCode', 'startDate', 'contractor', 'Vermiculite',
-        'Piping', 'Drywall', 'Insulation', 'Tiling', 'Floor_Tiles', 'Ceiling_Tiles',
-        'Ducting', 'Plaster', 'Stucco_Stipple', 'Fittings'}]
-    ].copy()
-
-    # Insert data into the tables
-    insert_data(df_raw_asbestos_data, 'raw_asbestos_data', engine)
-    insert_data(df_map_table, 'map_table', engine)
-    insert_data(df_data_table, 'data_table', engine)
-    insert_data(df_chart_table, 'chart_table', engine)
+    conn.close()
 
 if __name__ == '__main__':
     main()
