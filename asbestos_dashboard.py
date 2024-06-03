@@ -37,7 +37,7 @@ def fetch_data(table_name):
 # Create chart function
 def create_chart(df, selected_area, selected_condition):
     """Generates a bar chart for the selected condition or overall notification counts."""
-    df = df.sort_values('Forward_Sortation_Area')
+    df = df.sort_values('Forward_Sortation_Area').copy()
 
     if selected_condition != "All Conditions" and selected_condition not in df.columns:
         df[selected_condition] = 0
@@ -45,7 +45,6 @@ def create_chart(df, selected_area, selected_condition):
     if selected_condition == "All Notifications":
         count_df = df.groupby('Forward_Sortation_Area').size().reset_index(name='Counts')
     elif selected_condition == "All Conditions":
-        # Ensure that only numeric columns are considered
         numeric_columns = df.select_dtypes(include=['number']).columns
         count_df = df[numeric_columns].groupby(df['Forward_Sortation_Area']).sum().reset_index()
         count_df['Counts'] = df.groupby('Forward_Sortation_Area').size().values
@@ -53,16 +52,14 @@ def create_chart(df, selected_area, selected_condition):
         condition_counts = df[df[selected_condition] == 1].groupby('Forward_Sortation_Area').size().reset_index(name='Condition Counts')
         total_counts = df.groupby('Forward_Sortation_Area').size().reset_index(name='Total Counts')
         count_df = pd.merge(total_counts, condition_counts, on='Forward_Sortation_Area', how='left')
-        count_df['Condition Counts'].fillna(0, inplace=True)
+        count_df['Condition Counts'] = count_df['Condition Counts'].fillna(0)
         count_df['Condition Percentage'] = (count_df['Condition Counts'] / count_df['Total Counts']) * 100
 
     if selected_area not in count_df['Forward_Sortation_Area'].values and selected_area != "All Areas":
         return px.bar(title="No data available for the selected area")
 
-    # Title for the chart
     title_text = "Total Notifications per Area" if selected_condition in ["All Notifications", "All Conditions"] else f"Percentage of {selected_condition} per Area"
     
-    # Safely get the area value
     if selected_condition == "All Notifications":
         area_value = count_df.loc[count_df['Forward_Sortation_Area'] == selected_area, 'Counts']
     elif selected_condition == "All Conditions":
@@ -70,7 +67,6 @@ def create_chart(df, selected_area, selected_condition):
     else:
         area_value = count_df.loc[count_df['Forward_Sortation_Area'] == selected_area, 'Condition Percentage']
     
-    # Check if area_value is not empty before accessing it
     if not area_value.empty:
         area_value = area_value.iloc[0]
     else:
@@ -96,7 +92,7 @@ def create_table(df, selected_condition):
 
     for col in datetime_columns:
         if col in df.columns:
-            df.loc[:, col] = pd.to_datetime(df[col]).dt.date
+            df[col] = pd.to_datetime(df[col]).dt.date
 
     return df.to_dict('records')
 
@@ -118,8 +114,8 @@ def create_map(df, selected_area, selected_condition):
         return px.scatter_mapbox(title="No data available for the selected area")
 
     # Ensure that Latitude and Longitude columns are numeric
-    filtered_df.loc[:, 'Latitude'] = pd.to_numeric(filtered_df['Latitude'], errors='coerce')
-    filtered_df.loc[:, 'Longitude'] = pd.to_numeric(filtered_df['Longitude'], errors='coerce')
+    filtered_df['Latitude'] = pd.to_numeric(filtered_df['Latitude'], errors='coerce')
+    filtered_df['Longitude'] = pd.to_numeric(filtered_df['Longitude'], errors='coerce')
 
     # Drop rows with invalid Latitude or Longitude values
     filtered_df = filtered_df.dropna(subset=['Latitude', 'Longitude'])
@@ -154,11 +150,11 @@ def create_map(df, selected_area, selected_condition):
 
 # Layout of the application with CSS styling
 app.layout = html.Div(
-    style={'backgroundColor': '#2d2d2d', 'padding': '20px'},
+    style={'backgroundColor': '#d3d3d3', 'padding': '20px'},  # Light grey background
     children=[
-        html.H1("Asbestos Abatement Dashboard", style={'color': 'white', 'textAlign': 'center'}),
+        html.H1("Asbestos Abatement Dashboard", style={'color': 'black', 'textAlign': 'center'}),
         html.Div(
-            style={'backgroundColor': '#2d2d2d', 'padding': '10px', 'border': '1px solid white', 'marginBottom': '10px'},
+            style={'backgroundColor': '#d3d3d3', 'padding': '10px', 'marginBottom': '10px'},
             children=[
                 dcc.Dropdown(
                     id='area-dropdown',
@@ -171,7 +167,7 @@ app.layout = html.Div(
             ]
         ),
         html.Div(
-            style={'backgroundColor': '#2d2d2d', 'padding': '10px', 'border': '1px solid white', 'marginBottom': '10px'},
+            style={'backgroundColor': '#d3d3d3', 'padding': '10px', 'marginBottom': '10px'},
             children=[
                 dcc.Dropdown(
                     id='condition-dropdown',
@@ -184,27 +180,27 @@ app.layout = html.Div(
             ]
         ),
         html.Div(
-            style={'backgroundColor': '#2d2d2d', 'padding': '10px', 'border': '1px solid white', 'marginBottom': '10px'},
+            style={'backgroundColor': '#d3d3d3', 'padding': '10px', 'border': '3px solid white', 'marginBottom': '10px'},  # Thicker white border
             children=[
-                dcc.Graph(id='area-chart', style={'backgroundColor': '#2d2d2d'})
+                dcc.Graph(id='area-chart', style={'backgroundColor': '#d3d3d3'})
             ]
         ),
         html.Div(
-            style={'backgroundColor': '#2d2d2d', 'padding': '10px', 'border': '1px solid white', 'marginBottom': '10px'},
+            style={'backgroundColor': '#d3d3d3', 'padding': '10px', 'border': '3px solid white', 'marginBottom': '10px'},  # Thicker white border
             children=[
-                dcc.Graph(id='map-plot', style={'backgroundColor': '#2d2d2d'})
+                dcc.Graph(id='map-plot', style={'backgroundColor': '#d3d3d3'})
             ]
         ),
         html.Div(
-            style={'backgroundColor': '#2d2d2d', 'padding': '10px', 'border': '1px solid white', 'marginBottom': '10px'},
+            style={'backgroundColor': '#d3d3d3', 'padding': '10px', 'border': '3px solid white', 'marginBottom': '10px'},  # Thicker white border
             children=[
                 dash_table.DataTable(
                     id='pivot-table',
                     page_size=30,
                     hidden_columns=['supportDescription', 'startDate', 'endDate'],
                     style_table={'maxHeight': '300px', 'overflowY': 'auto'},
-                    style_header={'backgroundColor': 'white', 'color': 'black'},
-                    style_cell={'backgroundColor': '#2d2d2d', 'color': 'white'}
+                    style_header={'backgroundColor': 'white', 'color': 'black', 'fontWeight': 'bold'},  # Bold column headers
+                    style_cell={'backgroundColor': '#d3d3d3', 'color': 'black'}
                 )
             ]
         )
