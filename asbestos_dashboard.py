@@ -69,15 +69,15 @@ def create_chart(df, selected_area, selected_condition):
         if selected_condition == "All Conditions":
             area_value = count_df.loc[count_df['Forward_Sortation_Area'] == selected_area, 'Counts']
             area_value = area_value.iloc[0] if not area_value.empty else 0
-            title_text = f"Total Notifications in {selected_area}: {area_value}"
+            title_text = f"Total Notifications in {selected_area}: <b>{area_value}</b>"
         elif selected_condition == "Vermiculite":
             area_value = count_df.loc[count_df['Forward_Sortation_Area'] == selected_area, 'Condition Percentage']
             area_value = round(area_value.iloc[0], 2) if not area_value.empty else 0
-            title_text = f"Percentage where Vermiculite is Found for {selected_area}: {area_value}%"
+            title_text = f"Percentage where Vermiculite is Found for {selected_area}: <b>{area_value}%</b>"
         else:
             area_value = count_df.loc[count_df['Forward_Sortation_Area'] == selected_area, 'Condition Percentage']
             area_value = round(area_value.iloc[0], 2) if not area_value.empty else 0
-            title_text = f"Percentage where Asbestos is Found in {selected_condition} in {selected_area}: {area_value}%"
+            title_text = f"Percentage where Asbestos is Found in {selected_condition} in {selected_area}: <b>{area_value}%</b>"
 
     count_df['Highlight'] = count_df['Forward_Sortation_Area'].apply(lambda x: 'Selected' if x == selected_area else 'Other')
     color_discrete_map = {'Selected': 'red', 'Other': 'blue'}
