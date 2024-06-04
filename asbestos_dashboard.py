@@ -268,7 +268,7 @@ app.layout = html.Div(
     [Input('refresh_db', 'n_clicks'), Input('refresh_db', 'n_clicks_timestamp')],
 )
 
-def ref_database(n_clicks, n_clicks_timestamp):
+def ref_db_button(n_clicks, n_clicks_timestamp):
     if n_clicks > 0 and n_clicks_timestamp < 100:
         # Trigger the refresh_database() function
         refresh_database()
