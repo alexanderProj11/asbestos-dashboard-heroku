@@ -5,12 +5,11 @@ import pandas as pd
 from sqlalchemy import create_engine
 import os
 from dotenv import load_dotenv
-from flask import Flask, request, jsonify
+from flask import request, jsonify
 import subprocess
 import requests
 import threading
 import time
-from sqlalchemy.orm import sessionmaker
 
 
 # Load environment variables
@@ -146,17 +145,14 @@ def create_chart(df, selected_area, selected_condition):
 # Create table function
 def create_table(df, selected_area, selected_condition):
     """Generates a DataTable from DataFrame, formatting datetime columns to show only the date."""
+    filtered_df = df
+
     if selected_condition != "All Conditions":
         filtered_df = df[df[selected_condition] == 1].copy()  # Filter based on the selected condition
 
     if selected_area != "All Areas":
         filtered_df = filtered_df[filtered_df['Forward_Sortation_Area'] == selected_area].copy()
 
-    datetime_columns = ['startDate', 'endDate']
-
-    for col in datetime_columns:
-        if col in filtered_df.columns:
-            filtered_df[col] = pd.to_datetime(filtered_df[col]).dt.date
 
     return filtered_df.to_dict('records')
 
@@ -274,15 +270,14 @@ app.layout = html.Div(
             children=[
                 dash_table.DataTable(
                     id='pivot-table',
-                    page_size=30,
-                    style_table={'maxHeight': '600px', 'overflowY': 'auto'},
+                    
+                    style_table={'maxHeight': '300px', 'overflowY': 'auto'},
                     style_header={'backgroundColor': 'white', 'color': 'black', 'fontWeight': 'bold', 'textAlign': 'left', 'fontSize': '16px'},  # Bold column headers
                     style_cell={'backgroundColor': 'white', 'color': 'black', 
                                 'border': '2px solid lightgrey', 
                                 'textAlign': 'left'},
                     style_as_list_view=False,
-                    sort_action='native',
-                    filter_action='native'
+                    page_size=200,
                 )
             ]
         )
@@ -304,9 +299,11 @@ def update_output(selected_area, selected_condition):
 
     chart = create_chart(df_chart, selected_area, selected_condition)
     map_plot = create_map(df_map, selected_area, selected_condition)
+
     table_data = create_table(df_table, selected_area, selected_condition)
 
     return chart, map_plot, table_data
+
 
 
 if __name__ == "__main__":
