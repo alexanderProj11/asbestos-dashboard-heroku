@@ -24,7 +24,7 @@ def create_engine_and_tables(file_path, database_url):
     data_table_columns = [
         'confirmationNo', 'startDate', 'endDate','formattedAddress', 'supportDescription', 'owner', 'contractor', 'Vermiculite',
         'Piping', 'Drywall', 'Insulation', 'Tiling', 'Floor_Tiles', 'Ceiling_Tiles',
-        'Ducting', 'Plaster', 'Stucco_Stipple', 'Fittings'
+        'Ducting', 'Plaster', 'Stucco_Stipple', 'Fittings', 'Forward_Sortation_Area'
     ]
     
     chart_table_columns = [
