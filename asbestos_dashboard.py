@@ -275,12 +275,14 @@ app.layout = html.Div(
                 dash_table.DataTable(
                     id='pivot-table',
                     page_size=30,
-                    style_table={'maxHeight': '300px', 'overflowY': 'auto'},
+                    style_table={'maxHeight': '600px', 'overflowY': 'auto'},
                     style_header={'backgroundColor': 'white', 'color': 'black', 'fontWeight': 'bold', 'textAlign': 'left', 'fontSize': '16px'},  # Bold column headers
                     style_cell={'backgroundColor': 'white', 'color': 'black', 
                                 'border': '2px solid lightgrey', 
                                 'textAlign': 'left'},
                     style_as_list_view=False,
+                    sort_action='native',
+                    filter_action='native'
                 )
             ]
         )
