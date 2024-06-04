@@ -144,18 +144,21 @@ def create_chart(df, selected_area, selected_condition):
     return fig
 
 # Create table function
-def create_table(df, selected_condition):
+def create_table(df, selected_area, selected_condition):
     """Generates a DataTable from DataFrame, formatting datetime columns to show only the date."""
     if selected_condition != "All Conditions":
-        df = df[df[selected_condition] == 1].copy()  # Filter based on the selected condition
+        filtered_df = df[df[selected_condition] == 1].copy()  # Filter based on the selected condition
+
+    if selected_area != "All Areas":
+        filtered_df = filtered_df[filtered_df['Forward_Sortation_Area'] == selected_area].copy()
 
     datetime_columns = ['startDate', 'endDate']
 
     for col in datetime_columns:
-        if col in df.columns:
-            df[col] = pd.to_datetime(df[col]).dt.date
+        if col in filtered_df.columns:
+            filtered_df[col] = pd.to_datetime(filtered_df[col]).dt.date
 
-    return df.to_dict('records')
+    return filtered_df.to_dict('records')
 
 # Create map function
 def create_map(df, selected_area, selected_condition):
@@ -299,7 +302,7 @@ def update_output(selected_area, selected_condition):
 
     chart = create_chart(df_chart, selected_area, selected_condition)
     map_plot = create_map(df_map, selected_area, selected_condition)
-    table_data = create_table(df_table, selected_condition)
+    table_data = create_table(df_table, selected_area, selected_condition)
 
     return chart, map_plot, table_data
 
