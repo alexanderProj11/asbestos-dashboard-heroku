@@ -11,7 +11,7 @@ import requests
 import threading
 import time
 from sqlalchemy.orm import sessionmaker
-import setup_database
+
 
 # Load environment variables
 load_dotenv()
