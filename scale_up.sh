@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#Is this script necessary?
+
 # Define the application name
 APP_NAME="asbestos-dashboard"
 

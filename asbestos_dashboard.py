@@ -1,3 +1,4 @@
+
 import dash
 from dash import html, dcc, Input, Output, dash_table
 import plotly.express as px
@@ -11,6 +12,7 @@ import requests
 import threading
 import time
 from sqlalchemy.orm import sessionmaker
+import setup_database
 
 # Load environment variables
 load_dotenv()
@@ -30,7 +32,9 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
 
 engine = create_engine(
-    DATABASE_URL, 
+    DATABASE_URL,
+    pool_size=0,
+    max_overflow=10, 
     pool_timeout=30,           # Timeout to get a connection from the pool
     pool_recycle=3600,         # Recycle connections every hour
     pool_pre_ping=True,        # Test connection for liveness)
@@ -187,6 +191,17 @@ app.layout = html.Div(
     style={'backgroundColor': '#d3d3d3', 'padding': '20px'},  # Light grey background
     children=[
         html.H1("Asbestos Abatement Dashboard", style={'color': 'black', 'textAlign': 'center'}),
+        html.Button("Refresh Database", id='refresh_db', style={'textAlign': 'right'},
+                    children=[
+                        dcc.Loading(
+                            id="refresh_db_loading",
+                            children=[html.Div(id="loading_output_1")],
+                            type="default"
+                        )
+                    ],
+                    n_clicks_timestamp=0,
+                    n_clicks=0
+                    ),
         html.Div(
             style={'backgroundColor': '#d3d3d3', 'padding': '10px', 'marginBottom': '10px'},
             children=[
@@ -248,6 +263,26 @@ app.layout = html.Div(
     [Output('area-chart', 'figure'), Output('map-plot', 'figure'), Output('pivot-table', 'data')],
     [Input('area-dropdown', 'value'), Input('condition-dropdown', 'value')]
 )
+@app.callback(
+    [Output('refresh_db', 'children'), Output('refresh_db_loading', 'loading_output_1')],
+    [Input('refresh_db', 'n_clicks'), Input('refresh_db', 'n_clicks_timestamp')],
+)
+
+def ref_database(n_clicks, n_clicks_timestamp):
+    if n_clicks > 0 and n_clicks_timestamp < 100:
+        # Trigger the refresh_database() function
+        refresh_database()
+        return "Refreshing...", dcc.Loading(
+            id="loading-1",
+            children=[html.Div(id="loading_output_1")],
+            type="circle",
+        )
+    return "Refresh Database", html.Div(id="loading_output_1")
+
+
+def refresh_database():
+    setup_database.main()
+
 def update_output(selected_area, selected_condition):
     # df = fetch_data('asbestos_data') --- Used?
     df_map = fetch_data('map_table')

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Is this script necessary?
+
 # Get the current time and the last request time from your log or database
 current_time=$(date +%s)
 last_request_time=$(date -d "$(heroku logs --tail --app your-app-name | grep -Eo '2024-[0-9-]+ [0-9:]+')" +%s)
