@@ -8,6 +8,9 @@ from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 import subprocess
 import requests
+import threading
+import time
+from sqlalchemy.orm import sessionmaker
 
 # Load environment variables
 load_dotenv()
@@ -278,7 +281,24 @@ def trigger_scale_up():
     else:
         print(f"Failed to scale up dynos: {response.text}")
 
+# Background task to close idle connections
+def close_idle_connections(engine, idle_timeout=1200):
+    while True:
+        time.sleep(idle_timeout)
+        with engine.connect() as conn:
+            conn.execute("SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE state = 'idle' AND state_change < current_timestamp - interval '20 minutes';")
+            print("Idle connections closed.")
+
+# Start the background task
+def start_idle_connection_closer(engine):
+    thread = threading.Thread(target=close_idle_connections, args=(engine,))
+    thread.daemon = True
+    thread.start()
+
 if __name__ == "__main__":
 
     trigger_scale_up()
+
+    start_idle_connection_closer(engine)
+    
     app.run_server(debug=True)
