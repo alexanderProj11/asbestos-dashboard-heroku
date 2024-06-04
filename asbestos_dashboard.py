@@ -279,6 +279,7 @@ app.layout = html.Div(
                                 'textAlign': 'left'},
                     style_as_list_view=False,
                     page_size=200,
+                    filter_action='native'
                 )
             ]
         )
