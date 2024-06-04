@@ -1,4 +1,3 @@
-
 import dash
 from dash import html, dcc, Input, Output, dash_table
 import plotly.express as px
@@ -31,14 +30,52 @@ px.set_mapbox_access_token(mapbox_access_token)
 DATABASE_URL = os.getenv('DATABASE_URL')
 DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
 
+# Create DB engine
 engine = create_engine(
     DATABASE_URL,
     pool_size=0,
     max_overflow=10, 
     pool_timeout=30,           # Timeout to get a connection from the pool
     pool_recycle=3600,         # Recycle connections every hour
-    pool_pre_ping=True,        # Test connection for liveness)
+    pool_pre_ping=True,        # Test connection for liveness
+    echo=True
 )
+
+# Add a route to scale up the dynos
+@server.route('/scale_up', methods=['POST'])
+
+def scale_up():
+    secret_token = request.headers.get('Authorization')
+    if secret_token != os.getenv('SCALE_UP_SECRET_TOKEN'):
+        return jsonify({"error": "Unauthorized"}), 401
+
+    # Run the scale_up.sh script
+    result = subprocess.run(['./scale_up.sh'], capture_output=True, text=True)
+    return result.stdout, 200
+
+# Function to trigger scale up
+def trigger_scale_up():
+    url = 'https://asbestos-dashboard-2121da576ef0.herokuapp.com/scale_up'
+    headers = {'Authorization': os.getenv('SCALING_ACCESS_TOKEN')}
+    response = requests.post(url, headers=headers)
+    if response.status_code == 200:
+        print("Dynos scaled up successfully.")
+    else:
+        print(f"Failed to scale up dynos: {response.text}")
+
+# Background task to close idle connections
+def close_idle_connections(engine, idle_timeout=1200):
+    while True:
+        time.sleep(idle_timeout)
+        with engine.connect() as conn:
+            conn.execute("SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE state = 'idle' AND state_change < current_timestamp - interval '20 minutes';")
+            print("Idle connections closed.")
+
+# Start the background task
+def start_idle_connection_closer(engine):
+    thread = threading.Thread(target=close_idle_connections, args=(engine,))
+    thread.daemon = True
+    thread.start()
 
 # Fetch data function
 def fetch_data(table_name):
@@ -106,7 +143,7 @@ def create_chart(df, selected_area, selected_condition):
     fig.update_layout(showlegend=False)
     return fig
 
-
+# Create table function
 def create_table(df, selected_condition):
     """Generates a DataTable from DataFrame, formatting datetime columns to show only the date."""
     if selected_condition != "All Conditions":
@@ -120,6 +157,7 @@ def create_table(df, selected_condition):
 
     return df.to_dict('records')
 
+# Create map function
 def create_map(df, selected_area, selected_condition):
     if df.empty:
         return px.scatter_mapbox(title="No data available")
@@ -184,7 +222,6 @@ def create_map(df, selected_area, selected_condition):
     )
 
     return fig
-
 
 # Layout of the application with CSS styling
 app.layout = html.Div(
@@ -253,6 +290,7 @@ app.layout = html.Div(
     [Input('area-dropdown', 'value'), Input('condition-dropdown', 'value')]
 )
 
+# Update dashboard figures
 def update_output(selected_area, selected_condition):
     # df = fetch_data('asbestos_data') --- Used?
     df_map = fetch_data('map_table')
@@ -265,40 +303,6 @@ def update_output(selected_area, selected_condition):
 
     return chart, map_plot, table_data
 
-# Add a route to scale up the dynos
-@server.route('/scale_up', methods=['POST'])
-def scale_up():
-    secret_token = request.headers.get('Authorization')
-    if secret_token != os.getenv('SCALE_UP_SECRET_TOKEN'):
-        return jsonify({"error": "Unauthorized"}), 401
-
-    # Run the scale_up.sh script
-    result = subprocess.run(['./scale_up.sh'], capture_output=True, text=True)
-    return result.stdout, 200
-
-# Function to trigger scale up
-def trigger_scale_up():
-    url = 'https://asbestos-dashboard-2121da576ef0.herokuapp.com/scale_up'
-    headers = {'Authorization': os.getenv('SCALING_ACCESS_TOKEN')}
-    response = requests.post(url, headers=headers)
-    if response.status_code == 200:
-        print("Dynos scaled up successfully.")
-    else:
-        print(f"Failed to scale up dynos: {response.text}")
-
-# Background task to close idle connections
-def close_idle_connections(engine, idle_timeout=1200):
-    while True:
-        time.sleep(idle_timeout)
-        with engine.connect() as conn:
-            conn.execute("SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE state = 'idle' AND state_change < current_timestamp - interval '20 minutes';")
-            print("Idle connections closed.")
-
-# Start the background task
-def start_idle_connection_closer(engine):
-    thread = threading.Thread(target=close_idle_connections, args=(engine,))
-    thread.daemon = True
-    thread.start()
 
 if __name__ == "__main__":
 
