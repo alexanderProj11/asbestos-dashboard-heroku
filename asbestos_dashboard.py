@@ -153,6 +153,12 @@ def create_table(df, selected_area, selected_condition):
     if selected_area != "All Areas":
         filtered_df = filtered_df[filtered_df['Forward_Sortation_Area'] == selected_area].copy()
 
+    datetime_columns = ['startDate', 'endDate']
+
+    # Format each datetime column to date only
+    for col in datetime_columns:
+        if col in df.columns:
+            df[col] = pd.to_datetime(df[col]).dt.date
 
     return filtered_df.to_dict('records')
 
@@ -256,9 +262,7 @@ app.layout = html.Div(
         html.Div(
             style={'backgroundColor': '#d3d3d3', 'padding': '10px', 'border': '3px solid white', 'marginBottom': '10px'},  # Thicker white border
             children=[
-                dcc.Graph(id='area-chart', style={'backgroundColor': '#d3d3d3'},
-                          animate=True
-                          )
+                dcc.Graph(id='area-chart', style={'backgroundColor': '#d3d3d3'})
             ]
         ),
         html.Div(
@@ -273,10 +277,12 @@ app.layout = html.Div(
                 dash_table.DataTable(
                     id='pivot-table',
                     style_table={'maxHeight': '500px', 'overflowY': 'auto'},
-                    style_header={'backgroundColor': 'white', 'color': 'black', 'fontWeight': 'bold', 'textAlign': 'left', 'fontSize': '16px'},  # Bold column headers
+                    style_header={'backgroundColor': 'white', 'color': 'black', 'fontWeight': 'bold', 'textAlign': 'right', 'fontSize': '16px'},  # Bold column headers
                     style_cell={'backgroundColor': 'white', 'color': 'black', 
                                 'border': '2px solid lightgrey', 
-                                'textAlign': 'left'},
+                                'textAlign': 'left',
+                                'minWidth': '90px', 'width': '180px', 'maxWidth': '500px',
+                                },
                     style_as_list_view=False,
                     page_size=200,
                     sort_action='native',
