@@ -134,7 +134,7 @@ def create_chart(df, selected_area, selected_condition):
     color_discrete_map = {'Selected': 'red', 'Other': 'blue'}
 
     fig = px.bar(count_df, x='Forward_Sortation_Area', y='Counts' if selected_condition in ["All Notifications", "All Conditions"] else 'Condition Percentage',
-                 title=title_text, color='Highlight', color_discrete_map=color_discrete_map, hover_name='Forward_Sortation_Area')
+                 title=title_text, color='Highlight', color_discrete_map=color_discrete_map, hover_name='Forward_Sortation_Area', hover_data='Counts' if selected_condition in ["All Notifications", "All Conditions"] else 'Condition Percentage')
     
     # Update bar borders to be black
     fig.update_traces(marker_line_color='black', marker_line_width=1.0)
@@ -256,7 +256,9 @@ app.layout = html.Div(
         html.Div(
             style={'backgroundColor': '#d3d3d3', 'padding': '10px', 'border': '3px solid white', 'marginBottom': '10px'},  # Thicker white border
             children=[
-                dcc.Graph(id='area-chart', style={'backgroundColor': '#d3d3d3'})
+                dcc.Graph(id='area-chart', style={'backgroundColor': '#d3d3d3'},
+                          animate=True
+                          )
             ]
         ),
         html.Div(
