@@ -270,7 +270,6 @@ app.layout = html.Div(
             children=[
                 dash_table.DataTable(
                     id='pivot-table',
-                    
                     style_table={'maxHeight': '300px', 'overflowY': 'auto'},
                     style_header={'backgroundColor': 'white', 'color': 'black', 'fontWeight': 'bold', 'textAlign': 'left', 'fontSize': '16px'},  # Bold column headers
                     style_cell={'backgroundColor': 'white', 'color': 'black', 
