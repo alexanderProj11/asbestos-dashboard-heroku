@@ -1,3 +1,3 @@
-web: gunicorn asbestos_dashboard:server
+web: gunicorn app:server
 
 
