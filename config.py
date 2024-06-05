@@ -61,8 +61,7 @@ STYLE_CONFIG = {
     'padding': '20px',
     'header': {'color': 'black', 'textAlign': 'center'},
     'dropdown': {'backgroundColor': 'white', 'color': 'black'},
-    'graph': {'backgroundColor': '#d3d3d3',
-              'xaxis': {'tickfont': {'size': 14}}},
+    'graph': {'backgroundColor': '#d3d3d3'},
     'table': {
         'maxHeight': '500px',
         'overflowY': 'auto',

@@ -79,7 +79,7 @@ def create_chart(df, selected_area, selected_condition):
     # Update bar borders to be black
     fig.update_traces(marker_line_color='black', marker_line_width=1.2)
     
-    fig.update_layout(showlegend=False)
+    fig.update_layout(showlegend=False, xaxis={'tickfont': {'size': 14}})
     return fig
 
 def create_table(df, selected_area, selected_condition):
