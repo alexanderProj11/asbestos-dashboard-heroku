@@ -11,6 +11,33 @@ def load_config():
         raise ValueError("MAPBOX_ACCESS_TOKEN environment variable not set")
     return mapbox_access_token
 
+def get_database_url():
+    """
+    Get the database URL from the environment variables.
+
+    Parameters:
+    None
+
+    Returns:
+    database_url (str): The database URL.
+    """
+    DATABASE_URL = os.getenv('DATABASE_URL')
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
+    return DATABASE_URL
+
+def get_csv_file_path():
+    """
+    Get the CSV file path from the environment variables.
+
+    Parameters:
+    None
+
+    Returns:
+    file_path (str): The CSV file path.
+    """
+    file_path = os.getenv('CSV_FILE_PATH')
+    return file_path
+
 # Dropdown options
 AREA_DROPDOWN_OPTIONS = [{'label': 'All Areas', 'value': 'All Areas'}]
 CONDITION_DROPDOWN_OPTIONS = [
