@@ -10,6 +10,17 @@ load_dotenv()
 
 # Function to close active connections
 def close_active_connections():
+    """
+    Terminates all active connections to a specific PostgreSQL database, except the current connection.
+
+    This function connects to a PostgreSQL database using the connection string provided in the
+    environment variable 'DATABASE_URL'. It then executes a query to terminate all active connections
+    to the database named 'postgresql-infinite-47162', except for the current connection.
+
+    Raises:
+        Exception: If there is an error connecting to the database or executing the query, an exception
+                   is caught and its message is printed.
+    """
     try:
         # Connect to your PostgreSQL database
         DATABASE_URL = os.getenv('DATABASE_URL')

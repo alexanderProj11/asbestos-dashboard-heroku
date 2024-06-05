@@ -35,7 +35,7 @@ engine = create_engine(
     pool_size=1,               # Initial number of connections in the pool
     max_overflow=10,           # Maximum number of connections to create beyond the pool_size
     pool_timeout=30,           # Timeout in seconds to get a connection from the pool
-    pool_recycle=3600,         # Recycle connections every hour to avoid stale connections
+    pool_recycle=1800,         # Recycle connections every 30 minutes to avoid stale connections
     pool_pre_ping=True,        # Test connection for liveness before using it
     echo=True                  # Log all the SQL statements executed
 )
