@@ -4,10 +4,20 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from dotenv import load_dotenv
 
+# Load environment variables from a .env file
 load_dotenv()
 
 def create_engine_and_tables(file_path, database_url):
-    """Create database engine and multiple table schemas from a CSV file."""
+    """
+    Create a database engine and multiple table schemas from a CSV file.
+
+    Parameters:
+    file_path (str): The path to the CSV file containing the data.
+    database_url (str): The database URL for creating the SQLAlchemy engine.
+
+    Returns:
+    None
+    """
     # Create engine
     engine = create_engine(database_url)
 
@@ -44,7 +54,15 @@ def create_engine_and_tables(file_path, database_url):
         print(f"An error occurred: {e}")
 
 def main():
-    """Main function to handle workflow."""
+    """
+    Main function to handle the workflow of creating database tables from a CSV file.
+
+    Parameters:
+    None
+
+    Returns:
+    None
+    """
     # Database URL from the environment variables provided by Heroku
     DATABASE_URL = os.getenv("DATABASE_URL")
     file_path = 'all_Valid_Addresses.csv'  # Ensure the file name matches your actual file

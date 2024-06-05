@@ -12,14 +12,14 @@ import threading
 import time
 
 
-# Load environment variables
+# Load environment variables from a .env file
 load_dotenv()
 
 # Initialize the Dash app
 app = dash.Dash(__name__)
 server = app.server  # Expose the server variable for deployments
 
-# Set Mapbox token
+# Set Mapbox token for Plotly maps
 mapbox_access_token = os.environ.get('MAPBOX_ACCESS_TOKEN')
 if not mapbox_access_token:
     raise ValueError("MAPBOX_ACCESS_TOKEN environment variable not set")
@@ -29,17 +29,19 @@ px.set_mapbox_access_token(mapbox_access_token)
 DATABASE_URL = os.getenv('DATABASE_URL')
 DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
 
-# Create DB engine
+# Create a SQLAlchemy engine for database connections
 engine = create_engine(
     DATABASE_URL,
-    pool_size=0,
-    max_overflow=10, 
-    pool_timeout=30,           # Timeout to get a connection from the pool
-    pool_recycle=3600,         # Recycle connections every hour
-    pool_pre_ping=True,        # Test connection for liveness
-    echo=True
+    pool_size=1,               # Initial number of connections in the pool
+    max_overflow=10,           # Maximum number of connections to create beyond the pool_size
+    pool_timeout=30,           # Timeout in seconds to get a connection from the pool
+    pool_recycle=3600,         # Recycle connections every hour to avoid stale connections
+    pool_pre_ping=True,        # Test connection for liveness before using it
+    echo=True                  # Log all the SQL statements executed
 )
 
+""" SCALE UP FUNCTION - currently not working
+# Scale up function currently not working
 # Add a route to scale up the dynos
 @server.route('/scale_up', methods=['POST'])
 
@@ -62,8 +64,20 @@ def trigger_scale_up():
     else:
         print(f"Failed to scale up dynos: {response.text}")
 
+"""        
+
 # Background task to close idle connections
 def close_idle_connections(engine, idle_timeout=1200):
+    """
+    Periodically closes idle database connections to prevent resource exhaustion.
+
+    Args:
+        engine (sqlalchemy.engine.Engine): The SQLAlchemy engine used to connect to the database.
+        idle_timeout (int, optional): The interval in seconds to wait before checking for idle connections. Defaults to 1200 seconds (20 minutes).
+
+    Returns:
+        None
+    """
     while True:
         time.sleep(idle_timeout)
         with engine.connect() as conn:
@@ -72,12 +86,31 @@ def close_idle_connections(engine, idle_timeout=1200):
 
 # Start the background task
 def start_idle_connection_closer(engine):
+    """
+    Starts a background thread to periodically close idle database connections.
+
+    Args:
+        engine (sqlalchemy.engine.Engine): The SQLAlchemy engine used to connect to the database.
+
+    Returns:
+        None
+    """
     thread = threading.Thread(target=close_idle_connections, args=(engine,))
     thread.daemon = True
     thread.start()
 
 # Fetch data function
 def fetch_data(table_name):
+    """
+    Fetches all data from the specified table in the database.
+
+    Args:
+        table_name (str): The name of the table from which to fetch data.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing all the data from the specified table.
+                      If an error occurs, an empty DataFrame is returned.
+    """
     query = f'SELECT * FROM {table_name}'
     try:
         return pd.read_sql_query(query, con=engine)
@@ -316,8 +349,8 @@ def update_output(selected_area, selected_condition):
 
 
 if __name__ == "__main__":
-
-    trigger_scale_up()
+    # Trigger scale up - Uncomment if scale up logic gets fixed.
+    # trigger_scale_up()
 
     start_idle_connection_closer(engine)
     
