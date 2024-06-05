@@ -19,15 +19,7 @@ def filter_data(df, selected_area, selected_condition):
         return pd.DataFrame()
 
 def fetch_data(table_name):
-    query = f'''
-    SELECT *, 
-           CASE 
-               WHEN '{table_name}' = 'map_table' THEN 'map'
-               WHEN '{table_name}' = 'chart_table' THEN 'chart'
-               WHEN '{table_name}' = 'data_table' THEN 'data'
-           END as table_type
-    FROM {table_name}
-    '''
+    query = f'SELECT * FROM {table_name}'
     try:
         return pd.read_sql_query(query, con=engine)
     except Exception as e:
