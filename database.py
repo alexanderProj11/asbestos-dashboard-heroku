@@ -2,13 +2,10 @@ from sqlalchemy import create_engine
 import os
 import threading
 import time
+from config import get_database_url
 
 # Database connection setup
-DATABASE_URL = os.getenv('DATABASE_URL')
-if DATABASE_URL:
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
-else:
-    raise ValueError("DATABASE_URL environment variable not set")
+DATABASE_URL = get_database_url()
 
 try:
     # Create a SQLAlchemy engine for database connections
