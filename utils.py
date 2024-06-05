@@ -22,9 +22,9 @@ def fetch_data(table_name):
     query = f'''
     SELECT *, 
            CASE 
-               WHEN table_name = 'map_table' THEN 'map'
-               WHEN table_name = 'chart_table' THEN 'chart'
-               WHEN table_name = 'data_table' THEN 'data'
+               WHEN '{table_name}' = 'map_table' THEN 'map'
+               WHEN '{table_name}' = 'chart_table' THEN 'chart'
+               WHEN '{table_name}' = 'data_table' THEN 'data'
            END as table_type
     FROM {table_name}
     '''

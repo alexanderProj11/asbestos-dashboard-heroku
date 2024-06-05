@@ -9,12 +9,12 @@ def register_callbacks(app):
     def update_output(selected_area, selected_condition):
         try:
             # Fetch all necessary data at once
-            df = fetch_data('combined_table')  # Assuming 'combined_table' contains all necessary data
+            df = fetch_data('asbestos_data') 
 
             # Filter data for each component
-            df_map = df[df['table_type'] == 'map']
-            df_chart = df[df['table_type'] == 'chart']
-            df_table = df[df['table_type'] == 'data']
+            df_map = df[df['table_type'] == 'map_table']
+            df_chart = df[df['table_type'] == 'chart_table']
+            df_table = df[df['table_type'] == 'data_table']
 
             # Create components
             chart = create_chart(df_chart, selected_area, selected_condition)
