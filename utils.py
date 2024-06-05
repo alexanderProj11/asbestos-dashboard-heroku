@@ -27,63 +27,60 @@ def fetch_data(table_name):
         return pd.DataFrame()
 
 def create_chart(df, selected_area, selected_condition):
-    try:
-        df = df.sort_values('Forward_Sortation_Area').copy()
-        df = filter_data(df, selected_area, selected_condition)
+    """Generates a bar chart for the selected condition or overall notification counts."""
+    df = df.sort_values('Forward_Sortation_Area').copy()
 
-        if selected_condition != "All Conditions" and selected_condition not in df.columns:
-            df[selected_condition] = 0
+    if selected_condition != "All Conditions" and selected_condition not in df.columns:
+        df[selected_condition] = 0
 
-        if selected_condition == "All Notifications":
-            count_df = df.groupby('Forward_Sortation_Area').size().reset_index(name='Counts')
-        elif selected_condition == "All Conditions":
-            numeric_columns = df.select_dtypes(include=['number']).columns
-            count_df = df[numeric_columns].groupby(df['Forward_Sortation_Area']).sum().reset_index()
-            count_df['Counts'] = df.groupby('Forward_Sortation_Area').size().values
+    if selected_condition == "All Notifications":
+        count_df = df.groupby('Forward_Sortation_Area').size().reset_index(name='Counts')
+    elif selected_condition == "All Conditions":
+        numeric_columns = df.select_dtypes(include=['number']).columns
+        count_df = df[numeric_columns].groupby(df['Forward_Sortation_Area']).sum().reset_index()
+        count_df['Counts'] = df.groupby('Forward_Sortation_Area').size().values
+    else:
+        condition_counts = df[df[selected_condition] == 1].groupby('Forward_Sortation_Area').size().reset_index(name='Condition Counts')
+        total_counts = df.groupby('Forward_Sortation_Area').size().reset_index(name='Total Counts')
+        count_df = pd.merge(total_counts, condition_counts, on='Forward_Sortation_Area', how='left')
+        count_df['Condition Counts'] = count_df['Condition Counts'].fillna(0)
+        count_df['Condition Percentage'] = (count_df['Condition Counts'] / count_df['Total Counts']) * 100
+
+    if selected_area not in count_df['Forward_Sortation_Area'].values and selected_area != "All Areas":
+        return px.bar(title="No data available for the selected area")
+
+    if selected_area == "All Areas":
+        if selected_condition == "All Conditions":
+            title_text = "Total Notifications per Area"
+        elif selected_condition == "Vermiculite":
+            title_text = "Percentage of Time Vermiculite is Found by Area"
         else:
-            condition_counts = df[df[selected_condition] == 1].groupby('Forward_Sortation_Area').size().reset_index(name='Condition Counts')
-            total_counts = df.groupby('Forward_Sortation_Area').size().reset_index(name='Total Counts')
-            count_df = pd.merge(total_counts, condition_counts, on='Forward_Sortation_Area', how='left')
-            count_df['Condition Counts'] = count_df['Condition Counts'].fillna(0)
-            count_df['Condition Percentage'] = (count_df['Condition Counts'] / count_df['Total Counts']) * 100
-
-        if selected_area not in count_df['Forward_Sortation_Area'].values and selected_area != "All Areas":
-            return px.bar(title="No data available for the selected area")
-
-        if selected_area == "All Areas":
-            if selected_condition == "All Conditions":
-                title_text = "Total Notifications per Area"
-            elif selected_condition == "Vermiculite":
-                title_text = "Percentage of Time Vermiculite is Found by Area"
-            else:
-                title_text = f"Percentage where Asbestos found in {selected_condition} by Area"
+            title_text = f"Percentage where Asbestos found in {selected_condition} by Area"
+    else:
+        if selected_condition == "All Conditions":
+            area_value = count_df.loc[count_df['Forward_Sortation_Area'] == selected_area, 'Counts']
+            area_value = area_value.iloc[0] if not area_value.empty else 0
+            title_text = f"Total Notifications in {selected_area}: <b>{area_value}</b>"
+        elif selected_condition == "Vermiculite":
+            area_value = count_df.loc[count_df['Forward_Sortation_Area'] == selected_area, 'Condition Percentage']
+            area_value = round(area_value.iloc[0], 2) if not area_value.empty else 0
+            title_text = f"Percentage where Vermiculite is Found for {selected_area}: <b>{area_value}%</b>"
         else:
-            if selected_condition == "All Conditions":
-                area_value = count_df.loc[count_df['Forward_Sortation_Area'] == selected_area, 'Counts']
-                area_value = area_value.iloc[0] if not area_value.empty else 0
-                title_text = f"Total Notifications in {selected_area}: <b>{area_value}</b>"
-            elif selected_condition == "Vermiculite":
-                area_value = count_df.loc[count_df['Forward_Sortation_Area'] == selected_area, 'Condition Percentage']
-                area_value = round(area_value.iloc[0], 2) if not area_value.empty else 0
-                title_text = f"Percentage where Vermiculite is Found for {selected_area}: <b>{area_value}%</b>"
-            else:
-                area_value = count_df.loc[count_df['Forward_Sortation_Area'] == selected_area, 'Condition Percentage']
-                area_value = round(area_value.iloc[0], 2) if not area_value.empty else 0
-                title_text = f"Percentage where Asbestos is Found in {selected_condition} in {selected_area}: <b>{area_value}%</b>"
+            area_value = count_df.loc[count_df['Forward_Sortation_Area'] == selected_area, 'Condition Percentage']
+            area_value = round(area_value.iloc[0], 2) if not area_value.empty else 0
+            title_text = f"Percentage where Asbestos is Found in {selected_condition} in {selected_area}: <b>{area_value}%</b>"
 
-        count_df['Highlight'] = count_df['Forward_Sortation_Area'].apply(lambda x: 'Selected' if x == selected_area else 'Other')
-        color_discrete_map = {'Selected': 'red', 'Other': 'blue'}
+    count_df['Highlight'] = count_df['Forward_Sortation_Area'].apply(lambda x: 'Selected' if x == selected_area else 'Other')
+    color_discrete_map = {'Selected': 'red', 'Other': 'blue'}
 
-        fig = px.bar(count_df, x='Forward_Sortation_Area', y='Counts' if selected_condition in ["All Notifications", "All Conditions"] else 'Condition Percentage',
-                     title=title_text, color='Highlight', color_discrete_map=color_discrete_map, hover_name='Forward_Sortation_Area')
-        
-        fig.update_traces(marker_line_color='black', marker_line_width=1.2)
-        fig.update_layout(showlegend=False)
-        
-        return fig
-    except Exception as e:
-        print(f"Error creating chart: {e}")
-        return px.bar(title="Error creating chart")
+    fig = px.bar(count_df, x='Forward_Sortation_Area', y='Counts' if selected_condition in ["All Notifications", "All Conditions"] else 'Condition Percentage',
+                 title=title_text, color='Highlight', color_discrete_map=color_discrete_map, hover_name='Forward_Sortation_Area')
+    
+    # Update bar borders to be black
+    fig.update_traces(marker_line_color='black', marker_line_width=1.2)
+    
+    fig.update_layout(showlegend=False)
+    return fig
 
 def create_table(df, selected_area, selected_condition):
     try:

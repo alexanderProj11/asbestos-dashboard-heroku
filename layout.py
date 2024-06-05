@@ -21,7 +21,7 @@ app_layout = html.Div(
                     value='All Areas',
                     placeholder="Select a Forward Sortation Area",
                     searchable=True,
-                    style=STYLE_CONFIG['dropdown']
+                    style=STYLE_CONFIG['dropdown'],
                 )
             ]
         ),
