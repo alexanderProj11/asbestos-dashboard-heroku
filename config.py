@@ -1,9 +1,9 @@
 import os
 from dotenv import load_dotenv
+load_dotenv()
 
 def load_config():
     # Load environment variables from a .env file
-    load_dotenv()
 
     # Set Mapbox token for Plotly maps
     mapbox_access_token = os.environ.get('MAPBOX_ACCESS_TOKEN')
