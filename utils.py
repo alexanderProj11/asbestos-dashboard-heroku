@@ -100,7 +100,7 @@ def create_table(df, selected_area, selected_condition):
         print(f"Error creating table: {e}")
         return []
 
-def create_map(df, selected_area, selected_condition, custom_style_url):
+def create_map(df, selected_area, selected_condition, custom_style_url, tileset_id):
     try:
         if df.empty:
             return px.scatter_mapbox(title="No data available")
@@ -148,8 +148,22 @@ def create_map(df, selected_area, selected_condition, custom_style_url):
         # Add tileset to the map
         fig.update_layout(
             mapbox_style=custom_style_url,
-            mapbox_accesstoken=MAPBOX_ACCESS_TOKEN,
+            mapbox_accesstoken=os.getenv('MAPBOX_ACCESS_TOKEN'),
             margin={"r": 0, "t": 0, "l": 0, "b": 0},
+            mapbox={
+                'layers': [
+                    {
+                        'source': f'mapbox://{tileset_id}',
+                        'sourcelayer': 'fsa_bounds_manitoba_canada',  # Replace with the actual layer name
+                        'type': 'line',
+                        'line': {
+                            'color': '#888888',
+                            'width': 2,
+                            'opacity': 0.5
+                        }
+                    }
+                ]
+            }
         )
 
         return fig

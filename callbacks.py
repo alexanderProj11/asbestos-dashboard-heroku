@@ -1,6 +1,7 @@
 from dash import Input, Output
 from utils import fetch_data, create_chart, create_map, create_table
-from config import custom_style_url
+from config import custom_style_url, tileset_id
+
 
 
 def register_callbacks(app):
@@ -15,7 +16,7 @@ def register_callbacks(app):
             df_table = fetch_data('data_table')
 
             chart = create_chart(df_chart, selected_area, selected_condition)
-            map_plot = create_map(df_map, selected_area, selected_condition, custom_style_url)
+            map_plot = create_map(df_map, selected_area, selected_condition, custom_style_url, tileset_id)
             table_data = create_table(df_table, selected_area, selected_condition)
 
             return chart, map_plot, table_data
