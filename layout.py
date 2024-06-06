@@ -81,7 +81,7 @@ page_2_layout = html.Div(
         html.Div(
             style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': '10px', 'border': '3px solid white', 'marginBottom': '10px'},
             children=[
-                dcc.Graph(id='area-chart', style=STYLE_CONFIG['graph'])
+                dcc.Graph(id='area-chart', style={**STYLE_CONFIG['graph'], 'height': '800px'})  # Adjust the height as needed
             ]
         )
     ]
@@ -92,12 +92,39 @@ page_3_layout = html.Div(
     style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': STYLE_CONFIG['padding']},
     children=[
         html.H1("Map", style=STYLE_CONFIG['header']),
+        html.H2("Asbestos Abatement Dashboard", style=STYLE_CONFIG['header']),
+        html.Div(
+            style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': '10px', 'marginBottom': '10px'},
+            children=[
+                dcc.Dropdown(
+                    id='area-dropdown',
+                    options=area_options,
+                    value='All Areas',
+                    placeholder="Select a Forward Sortation Area",
+                    searchable=True,
+                    style=STYLE_CONFIG['dropdown'],
+                )
+            ]
+        ),
+        html.Div(
+            style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': '10px', 'marginBottom': '10px'},
+            children=[
+                dcc.Dropdown(
+                    id='condition-dropdown',
+                    options=CONDITION_DROPDOWN_OPTIONS,
+                    value='All Conditions',
+                    placeholder="Select Condition",
+                    searchable=True,
+                    style=STYLE_CONFIG['dropdown']
+                )
+            ]
+        ),
         html.Div(
             style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': '10px', 'border': '3px solid white', 'marginBottom': '10px'},
             children=[
                 dcc.Graph(id='map-plot', style=STYLE_CONFIG['graph'])
             ]
-        )
+        ),
     ]
 )
 

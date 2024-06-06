@@ -66,7 +66,8 @@ STYLE_CONFIG = {
     'dropdown': {'backgroundColor': 'white', 'color': 'black'},
     'graph': {'backgroundColor': '#d3d3d3'},
     'table': {
-        'maxHeight': '500px',
+        'height': '500px',
+        'maxHeight': '800px',
         'overflowY': 'auto',
         'header': {'backgroundColor': 'white', 'color': 'black', 'fontWeight': 'bold', 'textAlign': 'right', 'fontSize': '16px'},
         'cell': {'backgroundColor': 'white', 'color': 'black', 'border': '2px solid lightgrey', 'textAlign': 'left', 'minWidth': '90px', 'width': '180px', 'maxWidth': '500px'}
