@@ -2,8 +2,6 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-geojson_path = 'lfsa000a16a_e.geojson'
-
 def load_config():
     # Load environment variables from a .env file
 

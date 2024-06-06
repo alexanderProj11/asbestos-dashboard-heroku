@@ -3,6 +3,9 @@ import plotly.express as px
 from database import engine
 import os
 import json
+from config import load_config
+
+MAPBOX_ACCESS_TOKEN = load_config()
 
 def filter_data(df, selected_area, selected_condition):
     try:
@@ -97,7 +100,7 @@ def create_table(df, selected_area, selected_condition):
         print(f"Error creating table: {e}")
         return []
 
-def create_map(df, selected_area, selected_condition, geojson_path):
+def create_map(df, selected_area, selected_condition, tileset_id):
     try:
         if df.empty:
             return px.scatter_mapbox(title="No data available")
@@ -142,25 +145,16 @@ def create_map(df, selected_area, selected_condition, geojson_path):
             title=map_title
         )
 
+        # Add tileset to the map
         fig.update_layout(
             mapbox_style="streets",
-            mapbox_accesstoken=os.getenv('MAPBOX_ACCESS_TOKEN'),
-            margin={"r": 0, "t": 0, "l": 0, "b": 0}
-        )
-
-        # Load GeoJSON file in binary mode and decode
-        with open(geojson_path, 'rb') as f:
-            geojson_data = json.loads(f.read().decode('utf-8', errors='replace'))
-
-        # Add GeoJSON layer to the map
-        fig.update_layout(
+            mapbox_accesstoken=MAPBOX_ACCESS_TOKEN,
+            margin={"r": 0, "t": 0, "l": 0, "b": 0},
             mapbox={
                 'layers': [
                     {
-                        'source': geojson_data,
-                        'type': 'line',
-                        'color': 'black',
-                        'line': {'width': 2}
+                        'source': f'mapbox://{'alexsala826.clx3i34kj5tug1uk78pxjofia-9d5rn'}',
+                        'type': 'fill'
                     }
                 ]
             }
