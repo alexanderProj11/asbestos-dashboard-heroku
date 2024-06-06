@@ -148,9 +148,9 @@ def create_map(df, selected_area, selected_condition, geojson_path):
             margin={"r": 0, "t": 0, "l": 0, "b": 0}
         )
 
-        # Load GeoJSON file
-        with open(geojson_path, encoding='utf-8') as f:
-            geojson_data = json.load(f)
+        # Load GeoJSON file in binary mode and decode
+        with open(geojson_path, 'rb') as f:
+            geojson_data = json.loads(f.read().decode('utf-8', errors='replace'))
 
         # Add GeoJSON layer to the map
         fig.update_layout(
