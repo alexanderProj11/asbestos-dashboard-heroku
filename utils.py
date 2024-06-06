@@ -149,7 +149,7 @@ def create_map(df, selected_area, selected_condition, tileset_id):
         fig.update_layout(
             mapbox_style="streets",
             mapbox_accesstoken=MAPBOX_ACCESS_TOKEN,
-            margin={"r": 1, "t": 1, "l": 1, "b": 1},
+            margin={"r": 0, "t": 0, "l": 0, "b": 0},
         )
 
         return fig
