@@ -100,7 +100,7 @@ def create_table(df, selected_area, selected_condition):
         print(f"Error creating table: {e}")
         return []
 
-def create_map(df, selected_area, selected_condition, tileset_id):
+def create_map(df, selected_area, selected_condition):
     try:
         if df.empty:
             return px.scatter_mapbox(title="No data available")
