@@ -77,7 +77,34 @@ page_1_layout = html.Div(
 page_2_layout = html.Div(
     style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': STYLE_CONFIG['padding']},
     children=[
-        html.H1("Bar Chart", style=STYLE_CONFIG['header']),
+        html.H1("Chart", style=STYLE_CONFIG['header']),
+        html.H2("Asbestos Abatement Dashboard", style=STYLE_CONFIG['header']),
+        html.Div(
+            style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': '10px', 'marginBottom': '10px'},
+            children=[
+                dcc.Dropdown(
+                    id='area-dropdown',
+                    options=area_options,
+                    value='All Areas',
+                    placeholder="Select a Forward Sortation Area",
+                    searchable=True,
+                    style=STYLE_CONFIG['dropdown'],
+                )
+            ]
+        ),
+        html.Div(
+            style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': '10px', 'marginBottom': '10px'},
+            children=[
+                dcc.Dropdown(
+                    id='condition-dropdown',
+                    options=CONDITION_DROPDOWN_OPTIONS,
+                    value='All Conditions',
+                    placeholder="Select Condition",
+                    searchable=True,
+                    style=STYLE_CONFIG['dropdown']
+                )
+            ]
+        ),
         html.Div(
             style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': '10px', 'border': '3px solid white', 'marginBottom': '10px'},
             children=[
@@ -132,6 +159,34 @@ page_3_layout = html.Div(
 page_4_layout = html.Div(
     style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': STYLE_CONFIG['padding']},
     children=[
+        html.H1("Table", style=STYLE_CONFIG['header']),
+        html.H2("Asbestos Abatement Dashboard", style=STYLE_CONFIG['header']),
+        html.Div(
+            style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': '10px', 'marginBottom': '10px'},
+            children=[
+                dcc.Dropdown(
+                    id='area-dropdown',
+                    options=area_options,
+                    value='All Areas',
+                    placeholder="Select a Forward Sortation Area",
+                    searchable=True,
+                    style=STYLE_CONFIG['dropdown'],
+                )
+            ]
+        ),
+        html.Div(
+            style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': '10px', 'marginBottom': '10px'},
+            children=[
+                dcc.Dropdown(
+                    id='condition-dropdown',
+                    options=CONDITION_DROPDOWN_OPTIONS,
+                    value='All Conditions',
+                    placeholder="Select Condition",
+                    searchable=True,
+                    style=STYLE_CONFIG['dropdown']
+                )
+            ]
+        ),
         html.H1("Data Table", style=STYLE_CONFIG['header']),
         html.Div(
             style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': '10px', 'border': '3px solid white', 'marginBottom': '10px'},
