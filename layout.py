@@ -108,7 +108,7 @@ page_2_layout = html.Div(
         html.Div(
             style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': '10px', 'border': '3px solid white', 'marginBottom': '10px'},
             children=[
-                dcc.Graph(id='area-chart', style={**STYLE_CONFIG['graph'], 'height': '800px'})  # Adjust the height as needed
+                dcc.Graph(id='area-chart', style={**STYLE_CONFIG['graph'], 'height': '600px'})  # Adjust the height as needed
             ]
         )
     ]
@@ -198,7 +198,8 @@ page_4_layout = html.Div(
                     page_size=200,
                     sort_action='native',
                     sort_mode='multi',
-                    filter_action='native'
+                    row_selectable='single',
+                    column_selectable='single',
                 )
             ]
         )

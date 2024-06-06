@@ -190,7 +190,6 @@ def create_map(df, selected_area, selected_condition):
             lon='Longitude',
             hover_name='contractor',
             hover_data=['formattedAddress', 'startDate', 'postalCode', 'confirmationNo'],
-            size=5,
             size_max=15,
             zoom=10 if selected_area == "All Areas" else 12,
             center=center,

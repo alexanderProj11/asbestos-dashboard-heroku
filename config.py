@@ -67,7 +67,7 @@ STYLE_CONFIG = {
     'graph': {'backgroundColor': '#d3d3d3'},
     'table': {
         'height': '500px',
-        'maxHeight': '800px',
+        'maxHeight': '600px',
         'overflowY': 'auto',
         'header': {'backgroundColor': 'white', 'color': 'black', 'fontWeight': 'bold', 'textAlign': 'right', 'fontSize': '16px'},
         'cell': {'backgroundColor': 'white', 'color': 'black', 'border': '2px solid lightgrey', 'textAlign': 'left', 'minWidth': '90px', 'width': '180px', 'maxWidth': '500px'}
