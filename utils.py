@@ -132,8 +132,8 @@ def create_table(df, selected_area, selected_condition):
 
         datetime_columns = ['startDate', 'endDate']
         for col in datetime_columns:
-            if col in df.columns:
-                df[col] = pd.to_datetime(df[col]).dt.date
+            if col in filtered_df.columns:
+                filtered_df[col] = pd.to_datetime(filtered_df[col]).dt.date
 
         return filtered_df.to_dict('records')
     except Exception as e:
@@ -190,6 +190,7 @@ def create_map(df, selected_area, selected_condition):
             lon='Longitude',
             hover_name='contractor',
             hover_data=['formattedAddress', 'startDate', 'postalCode', 'confirmationNo'],
+            size=5,
             size_max=15,
             zoom=10 if selected_area == "All Areas" else 12,
             center=center,

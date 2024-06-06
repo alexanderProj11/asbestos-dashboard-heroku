@@ -159,8 +159,6 @@ page_3_layout = html.Div(
 page_4_layout = html.Div(
     style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': STYLE_CONFIG['padding']},
     children=[
-        html.H1("Table", style=STYLE_CONFIG['header']),
-        html.H2("Asbestos Abatement Dashboard", style=STYLE_CONFIG['header']),
         html.Div(
             style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': '10px', 'marginBottom': '10px'},
             children=[
@@ -199,7 +197,8 @@ page_4_layout = html.Div(
                     style_as_list_view=False,
                     page_size=200,
                     sort_action='native',
-                    sort_mode='multi'
+                    sort_mode='multi',
+                    filter_action='native'
                 )
             ]
         )
