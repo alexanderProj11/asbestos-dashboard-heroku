@@ -153,7 +153,7 @@ def create_map(df, selected_area, selected_condition, tileset_id):
             mapbox={
                 'layers': [
                     {
-                        'source': f'mapbox://{'alexsala826.clx3i34kj5tug1uk78pxjofia-9d5rn'}',
+                        'source': f'mapbox://{tileset_id}',
                         'type': 'fill'
                     }
                 ]

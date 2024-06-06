@@ -1,6 +1,7 @@
 from dash import Input, Output
 from utils import fetch_data, create_chart, create_map, create_table
-from config import geojson_path
+from config import tileset_id
+
 
 def register_callbacks(app):
     @app.callback(
@@ -14,7 +15,7 @@ def register_callbacks(app):
             df_table = fetch_data('data_table')
 
             chart = create_chart(df_chart, selected_area, selected_condition)
-            map_plot = create_map(df_map, selected_area, selected_condition, geojson_path)
+            map_plot = create_map(df_map, selected_area, selected_condition, tileset_id)
             table_data = create_table(df_table, selected_area, selected_condition)
 
             return chart, map_plot, table_data
