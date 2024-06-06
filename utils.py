@@ -2,6 +2,7 @@ import pandas as pd
 import plotly.express as px
 from database import engine
 import os
+import json
 
 def filter_data(df, selected_area, selected_condition):
     try:
@@ -96,7 +97,7 @@ def create_table(df, selected_area, selected_condition):
         print(f"Error creating table: {e}")
         return []
 
-def create_map(df, selected_area, selected_condition):
+def create_map(df, selected_area, selected_condition, geojson_path):
     try:
         if df.empty:
             return px.scatter_mapbox(title="No data available")
@@ -134,7 +135,7 @@ def create_map(df, selected_area, selected_condition):
             lat='Latitude',
             lon='Longitude',
             hover_name='contractor',
-            hover_data=['formattedAddress', 'startDate', 'postalCode'],
+            hover_data=['formattedAddress', 'startDate', 'postalCode', 'confirmationNo'],
             size_max=15,
             zoom=10 if selected_area == "All Areas" else 12,
             center=center,
@@ -145,6 +146,24 @@ def create_map(df, selected_area, selected_condition):
             mapbox_style="streets",
             mapbox_accesstoken=os.getenv('MAPBOX_ACCESS_TOKEN'),
             margin={"r": 0, "t": 0, "l": 0, "b": 0}
+        )
+
+        # Load GeoJSON file
+        with open(geojson_path) as f:
+            geojson_data = json.load(f)
+
+        # Add GeoJSON layer to the map
+        fig.update_layout(
+            mapbox={
+                'layers': [
+                    {
+                        'source': geojson_data,
+                        'type': 'line',
+                        'color': 'black',
+                        'line': {'width': 2}
+                    }
+                ]
+            }
         )
 
         return fig

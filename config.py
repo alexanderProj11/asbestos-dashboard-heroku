@@ -2,6 +2,8 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
+geojson_path = 'C:\Users\ASala\Desktop\FSA_geospatial_package\GeoJSON\lfsa000a16a_e.geojson'
+
 def load_config():
     # Load environment variables from a .env file
 
