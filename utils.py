@@ -147,23 +147,9 @@ def create_map(df, selected_area, selected_condition, custom_style_url, tileset_
 
         # Add tileset to the map
         fig.update_layout(
-            mapbox_style=custom_style_url,
+            mapbox_style='streets',
             mapbox_accesstoken=os.getenv('MAPBOX_ACCESS_TOKEN'),
             margin={"r": 0, "t": 0, "l": 0, "b": 0},
-            mapbox={
-                'layers': [
-                    {
-                        'source': f'mapbox://{tileset_id}',
-                        'sourcelayer': 'fsa_bounds_manitoba_canada',  # Replace with the actual layer name
-                        'type': 'line',
-                        'line': {
-                            'color': '#888888',
-                            'width': 2,
-                            'opacity': 0.5
-                        }
-                    }
-                ]
-            }
         )
 
         return fig
