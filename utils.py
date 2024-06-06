@@ -8,6 +8,17 @@ from config import load_config
 MAPBOX_ACCESS_TOKEN = load_config()
 
 def filter_data(df, selected_area, selected_condition):
+    """
+    Filters the DataFrame based on the selected area and condition.
+
+    Parameters:
+    df (pd.DataFrame): The input DataFrame containing the data.
+    selected_area (str): The area to filter by. If "All Areas", no area filtering is applied.
+    selected_condition (str): The condition to filter by. If "All Conditions", no condition filtering is applied.
+
+    Returns:
+    pd.DataFrame: The filtered DataFrame.
+    """
     try:
         filtered_df = df.copy()
         
@@ -23,6 +34,15 @@ def filter_data(df, selected_area, selected_condition):
         return pd.DataFrame()
 
 def fetch_data(table_name):
+    """
+    Fetches data from the specified table in the database.
+
+    Parameters:
+    table_name (str): The name of the table to fetch data from.
+
+    Returns:
+    pd.DataFrame: The DataFrame containing the fetched data.
+    """
     query = f'SELECT * FROM {table_name}'
     try:
         return pd.read_sql_query(query, con=engine)
@@ -31,7 +51,17 @@ def fetch_data(table_name):
         return pd.DataFrame()
 
 def create_chart(df, selected_area, selected_condition):
-    """Generates a bar chart for the selected condition or overall notification counts."""
+    """
+    Generates a bar chart for the selected condition or overall notification counts.
+
+    Parameters:
+    df (pd.DataFrame): The input DataFrame containing the data.
+    selected_area (str): The area to filter by. If "All Areas", no area filtering is applied.
+    selected_condition (str): The condition to filter by. If "All Conditions", no condition filtering is applied.
+
+    Returns:
+    plotly.graph_objs._figure.Figure: The generated bar chart.
+    """
     df = df.sort_values('Forward_Sortation_Area').copy()
 
     if selected_condition != "All Conditions" and selected_condition not in df.columns:
@@ -73,20 +103,30 @@ def create_chart(df, selected_area, selected_condition):
             area_value = count_df.loc[count_df['Forward_Sortation_Area'] == selected_area, 'Condition Percentage']
             area_value = round(area_value.iloc[0], 2) if not area_value.empty else 0
             title_text = f"Percentage where Asbestos is Found in {selected_condition} in {selected_area}: <b>{area_value}%</b>"
-
+    
     count_df['Highlight'] = count_df['Forward_Sortation_Area'].apply(lambda x: 'Selected' if x == selected_area else 'Other')
     color_discrete_map = {'Selected': 'red', 'Other': 'blue'}
-
+    
     fig = px.bar(count_df, x='Forward_Sortation_Area', y='Counts' if selected_condition in ["All Notifications", "All Conditions"] else 'Condition Percentage',
                  title=title_text, color='Highlight', color_discrete_map=color_discrete_map, hover_name='Forward_Sortation_Area')
-    
     # Update bar borders to be black
     fig.update_traces(marker_line_color='black', marker_line_width=1.2)
-    
     fig.update_layout(showlegend=False, xaxis={'tickfont': {'size': 10}})
+    
     return fig
 
 def create_table(df, selected_area, selected_condition):
+    """
+    Creates a table representation of the filtered data.
+
+    Parameters:
+    df (pd.DataFrame): The input DataFrame containing the data.
+    selected_area (str): The area to filter by. If "All Areas", no area filtering is applied.
+    selected_condition (str): The condition to filter by. If "All Conditions", no condition filtering is applied.
+
+    Returns:
+    list: A list of dictionaries representing the filtered data.
+    """
     try:
         filtered_df = filter_data(df, selected_area, selected_condition)
 
@@ -101,6 +141,17 @@ def create_table(df, selected_area, selected_condition):
         return []
 
 def create_map(df, selected_area, selected_condition):
+    """
+    Creates a map visualization of the filtered data.
+
+    Parameters:
+    df (pd.DataFrame): The input DataFrame containing the data.
+    selected_area (str): The area to filter by. If "All Areas", no area filtering is applied.
+    selected_condition (str): The condition to filter by. If "All Conditions", no condition filtering is applied.
+
+    Returns:
+    plotly.graph_objs._figure.Figure: The generated map visualization.
+    """
     try:
         if df.empty:
             return px.scatter_mapbox(title="No data available")
