@@ -149,7 +149,7 @@ def create_map(df, selected_area, selected_condition, geojson_path):
         )
 
         # Load GeoJSON file
-        with open(geojson_path) as f:
+        with open(geojson_path, encoding='utf-8') as f:
             geojson_data = json.load(f)
 
         # Add GeoJSON layer to the map
