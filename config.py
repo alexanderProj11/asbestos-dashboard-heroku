@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-tileset_id = 'alexsala826.clx3i34kj5tug1uk78pxjofia-9d5rn'
+custom_style_url = "mapbox://styles/alexsala826/clx3jsx4w02jx01qph4etg651"
 
 def load_config():
     # Load environment variables from a .env file

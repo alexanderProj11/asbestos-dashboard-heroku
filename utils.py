@@ -100,7 +100,7 @@ def create_table(df, selected_area, selected_condition):
         print(f"Error creating table: {e}")
         return []
 
-def create_map(df, selected_area, selected_condition, tileset_id):
+def create_map(df, selected_area, selected_condition, custom_style_url):
     try:
         if df.empty:
             return px.scatter_mapbox(title="No data available")
@@ -147,17 +147,9 @@ def create_map(df, selected_area, selected_condition, tileset_id):
 
         # Add tileset to the map
         fig.update_layout(
-            mapbox_style="streets",
+            mapbox_style=custom_style_url,
             mapbox_accesstoken=MAPBOX_ACCESS_TOKEN,
             margin={"r": 0, "t": 0, "l": 0, "b": 0},
-            mapbox={
-                'layers': [
-                    {
-                        'source': f'mapbox://{tileset_id}',
-                        'type': 'fill'
-                    }
-                ]
-            }
         )
 
         return fig
