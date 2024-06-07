@@ -184,6 +184,10 @@ def create_map(df, selected_area, selected_condition):
             else:
                 map_title = f"{selected_area} - {selected_condition}"
 
+        # Load the GeoJSON file
+        with open('output_geojson_manitoba_fsa.geojson') as f:
+            geojson_data = json.load(f)
+
         fig = px.scatter_mapbox(
             filtered_df,
             lat='Latitude',
@@ -201,6 +205,14 @@ def create_map(df, selected_area, selected_condition):
             mapbox_style="streets",
             mapbox_accesstoken=MAPBOX_ACCESS_TOKEN,
             margin={"r": 0, "t": 0, "l": 0, "b": 0},
+            mapbox_layers=[
+                {
+                    "source": geojson_data,
+                    "type": "line",
+                    "below": "place-labels",
+                    "color": "rgba(226,141,141,100)"
+                }
+            ]
         )
 
         return fig
