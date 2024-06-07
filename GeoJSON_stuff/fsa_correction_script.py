@@ -25,7 +25,7 @@ errors_df = df_gdf[~df_gdf['FSA_Match']].copy()
 
 # Prepare the error DataFrame for saving
 errors_df = errors_df[['confirmationNo', 'Latitude', 'Longitude', 'formattedAddress', 'Forward_Sortation_Area', 'CFSAUID']]
-errors_df.columns = ['confirmationNo', 'Latitude', 'Longitude', 'Original FSA', 'New FSA']
+errors_df.columns = ['confirmationNo', 'Latitude', 'Longitude', 'formattedAddress', 'Original FSA', 'New FSA']
 
 # Save the errors to a new CSV file
 errors_df.to_csv('fsa_manitoba_errors.csv', index=False)
