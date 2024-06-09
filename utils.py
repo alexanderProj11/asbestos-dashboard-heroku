@@ -218,7 +218,7 @@ def create_map(df, selected_area, selected_condition):
                     "type": "line",
                     "below": "natural-labels",
                     "opacity": 1,
-                    "color": "rgba(238, 180, 180,0.5)",
+                    "color": "rgba(238, 180, 180, 10)",
                 }
             ]
         )
