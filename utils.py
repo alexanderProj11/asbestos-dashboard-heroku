@@ -217,7 +217,7 @@ def create_map(df, selected_area, selected_condition):
                         "features": []
                     },
                     "type": "line",
-                    "below": "place-labels"
+                    "below": "natural-labels"
                 },
                 {
                     "source": geojson_data,
