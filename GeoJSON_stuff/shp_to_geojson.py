@@ -23,11 +23,11 @@ dest_crs = 'epsg:4326'  # The EPSG code for WGS 84
 gdf = gdf.to_crs(dest_crs)
 
 # Filter the GeoDataFrame for specific province
-# gdf_filtered = gdf[gdf['PRNAME'] == 'Manitoba']
+gdf_filtered = gdf[gdf['PRNAME'] == 'Manitoba']
 
 # Save to GeoJSON - uncomment if filtering for specific province
-# gdf_filtered.to_file(output_geojson, driver='GeoJSON')
+gdf_filtered.to_file(output_geojson, driver='GeoJSON')
 
-gdf.to_file(output_geojson, driver='GeoJSON')
+# gdf.to_file(output_geojson, driver='GeoJSON')
 
 print(f"GeoJSON file has been saved to {output_geojson}")
