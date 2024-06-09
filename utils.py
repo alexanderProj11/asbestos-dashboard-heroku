@@ -225,11 +225,6 @@ def create_map(df, selected_area, selected_condition):
                     "below": "place-labels",
                     "opacity": 0.5,
                     "color": "rgba(226,141,141,0.5)"
-                },
-                                {
-                    "type": "symbol",
-                    "layout": {},
-                    "below": ""
                 }
             ]
         )
