@@ -203,7 +203,7 @@ def create_map(df, selected_area, selected_condition):
         )
 
         # Adjust opacity of the scatter points
-        fig.update_traces(marker={'opacity': 0.5})
+        fig.update_traces(marker={'opacity': 0.75})
 
         # Use custom Mapbox style
         # custom_style_url = 'mapbox://styles/alexsala826/clx7vfhzb01f801qoh6xah2a9'  # Replace with your custom style URL
