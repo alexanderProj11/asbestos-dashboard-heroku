@@ -197,20 +197,39 @@ def create_map(df, selected_area, selected_condition):
             size_max=15,
             zoom=10 if selected_area == "All Areas" else 12,
             center=center,
-            title=map_title
+            title=map_title,
+            opacity=0.5
         )
 
-        # Add tileset to the map
+        # Adjust opacity of the scatter points
+        # fig.update_traces(marker={'opacity': 0.5})
+
+        # Add tileset and GeoJSON layer to the map
         fig.update_layout(
             mapbox_style="streets",
             mapbox_accesstoken=MAPBOX_ACCESS_TOKEN,
             margin={"r": 0, "t": 0, "l": 0, "b": 0},
             mapbox_layers=[
+                # Dummy layer to ensure scatter points are below place-labels
+                {
+                    "source": {
+                        "type": "FeatureCollection",
+                        "features": []
+                    },
+                    "type": "line",
+                    "below": "place-labels"
+                },
                 {
                     "source": geojson_data,
                     "type": "line",
                     "below": "place-labels",
-                    "color": "rgba(226,141,141,100)"
+                    "opacity": 0.5,
+                    "color": "rgba(226,141,141,0.5)"
+                },
+                                {
+                    "type": "symbol",
+                    "layout": {},
+                    "below": ""
                 }
             ]
         )
