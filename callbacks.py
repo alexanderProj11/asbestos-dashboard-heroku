@@ -1,7 +1,6 @@
 from dash import Input, Output
 from dash.exceptions import PreventUpdate
 from utils import fetch_data, create_chart, create_map, create_table
-from config import custom_style_url, tileset_id
 from layout import page_1_layout, page_2_layout, page_3_layout, page_4_layout
 
 def register_callbacks(app):

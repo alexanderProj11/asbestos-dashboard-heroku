@@ -183,7 +183,9 @@ def create_map(df, selected_area, selected_condition):
                 map_title = f"{selected_area} - All Conditions"
             else:
                 map_title = f"{selected_area} - {selected_condition}"
-
+        
+        # Use custom Mapbox style
+        custom_style_url = 'mapbox://styles/alexsala826/clx7vfhzb01f801qoh6xah2a9'  # Replace with your custom style URL
         # Load the GeoJSON file
         with open('output_geojson_manitoba_fsa.geojson') as f:
             geojson_data = json.load(f)
@@ -194,41 +196,40 @@ def create_map(df, selected_area, selected_condition):
             lon='Longitude',
             hover_name='contractor',
             hover_data=['formattedAddress', 'startDate', 'postalCode', 'confirmationNo'],
-            size_max=15,
+            size_max=5,
             zoom=10 if selected_area == "All Areas" else 12,
             center=center,
             title=map_title,
+            mapbox_style="streets",
             opacity=0.5
         )
 
         # Adjust opacity of the scatter points
         # fig.update_traces(marker={'opacity': 0.5})
 
-        # Add tileset and GeoJSON layer to the map
+        # Use custom Mapbox style
+        custom_style_url = 'mapbox://styles/alexsala826/clx7vfhzb01f801qoh6xah2a9'  # Replace with your custom style URL
+
         fig.update_layout(
             mapbox_style="streets",
             mapbox_accesstoken=MAPBOX_ACCESS_TOKEN,
             margin={"r": 0, "t": 0, "l": 0, "b": 0},
             mapbox_layers=[
-                # Dummy layer to ensure scatter points are below place-labels
                 {
-                    "source": {
-                        "type": "FeatureCollection",
-                        "features": []
-                    },
-                    "type": "line",
-                    "below": "natural-labels"
+                    "source": "place-labels",
+                    "type": "symbol",
+                    "below": None,
+                    "opacity": 1,
                 },
                 {
                     "source": geojson_data,
                     "type": "line",
-                    "below": "place-labels",
+                    "below": "natural-labels",
                     "opacity": 0.5,
                     "color": "rgba(226,141,141,0.5)"
                 }
             ]
         )
-
         return fig
     except Exception as e:
         print(f"Error creating map: {e}")
