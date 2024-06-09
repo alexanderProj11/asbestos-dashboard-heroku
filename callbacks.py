@@ -22,7 +22,7 @@ def register_callbacks(app):
         [Input('url', 'pathname')]
     )
     def update_chart(selected_area, selected_condition, pathname):
-        if pathname != '/bar-chart' and pathname != '/':
+        if pathname not in ['/bar-chart', '/']:
             raise PreventUpdate
         try:
             df_chart = fetch_data('chart_table')
@@ -38,7 +38,7 @@ def register_callbacks(app):
         [Input('url', 'pathname')]
     )
     def update_map(selected_area, selected_condition, pathname):
-        if pathname != '/map' and pathname != '/':
+        if pathname not in ['/map', '/']:
             raise PreventUpdate
         try:
             df_map = fetch_data('map_table')
@@ -54,7 +54,7 @@ def register_callbacks(app):
         [Input('url', 'pathname')]
     )
     def update_table(selected_area, selected_condition, pathname):
-        if pathname != '/data-table' and pathname != '/':
+        if pathname not in ['/data-table', '/']:
             raise PreventUpdate
         try:
             df_table = fetch_data('data_table')

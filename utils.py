@@ -200,27 +200,19 @@ def create_map(df, selected_area, selected_condition):
             zoom=10 if selected_area == "All Areas" else 12,
             center=center,
             title=map_title,
-            mapbox_style="streets",
-            opacity=0.5
         )
 
         # Adjust opacity of the scatter points
         # fig.update_traces(marker={'opacity': 0.5})
 
         # Use custom Mapbox style
-        custom_style_url = 'mapbox://styles/alexsala826/clx7vfhzb01f801qoh6xah2a9'  # Replace with your custom style URL
+        # custom_style_url = 'mapbox://styles/alexsala826/clx7vfhzb01f801qoh6xah2a9'  # Replace with your custom style URL
 
         fig.update_layout(
             mapbox_style="streets",
             mapbox_accesstoken=MAPBOX_ACCESS_TOKEN,
             margin={"r": 0, "t": 0, "l": 0, "b": 0},
             mapbox_layers=[
-                {
-                    "source": "place-labels",
-                    "type": "symbol",
-                    "below": None,
-                    "opacity": 1,
-                },
                 {
                     "source": geojson_data,
                     "type": "line",
