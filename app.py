@@ -1,8 +1,7 @@
 from dash import Dash
 from config import load_config
 from database import engine, start_idle_connection_closer
-from layout import app_layout
-from callbacks import register_callbacks
+from callbacks_and_layout import app_layout, register_callbacks
 import logging
 
 # Configure logging
