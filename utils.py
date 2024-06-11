@@ -62,60 +62,44 @@ def create_chart(df, selected_area, selected_condition):
     Returns:
     plotly.graph_objs._figure.Figure: The generated bar chart.
     """
-    df = df.sort_values('Forward_Sortation_Area').copy()
-
-    if selected_condition != "All Conditions" and selected_condition not in df.columns:
-        df[selected_condition] = 0
-
-    if selected_condition == "All Notifications":
-        count_df = df.groupby('Forward_Sortation_Area').size().reset_index(name='Counts')
-    elif selected_condition == "All Conditions":
-        numeric_columns = df.select_dtypes(include=['number']).columns
-        count_df = df[numeric_columns].groupby(df['Forward_Sortation_Area']).sum().reset_index()
-        count_df['Counts'] = df.groupby('Forward_Sortation_Area').size().values
-    else:
-        condition_counts = df[df[selected_condition] == 1].groupby('Forward_Sortation_Area').size().reset_index(name='Condition Counts')
-        total_counts = df.groupby('Forward_Sortation_Area').size().reset_index(name='Total Counts')
-        count_df = pd.merge(total_counts, condition_counts, on='Forward_Sortation_Area', how='left')
-        count_df['Condition Counts'] = count_df['Condition Counts'].fillna(0)
-        count_df['Condition Percentage'] = (count_df['Condition Counts'] / count_df['Total Counts']) * 100
-
-    if selected_area not in count_df['Forward_Sortation_Area'].values and selected_area != "All Areas":
-        return px.bar(title="No data available for the selected area")
-
-    if selected_area == "All Areas":
-        if selected_condition == "All Conditions":
-            title_text = "Total Notifications per Area"
-        elif selected_condition == "Vermiculite":
-            title_text = "Percentage of Time Vermiculite is Found by Area"
+    try:
+        df_chart = df.copy()
+        
+        if selected_area == "All Areas":
+            if selected_condition == "All Conditions":
+                title_text = "Total Notifications by Area"
+            else:
+                title_text = f"Percentage of Time Asbestos is found in {selected_condition} by Area"
         else:
-            title_text = f"Percentage where Asbestos found in {selected_condition} by Area"
-    else:
+            if selected_condition == "All Conditions":
+                area_value_ttlcount = df_chart.loc[df_chart['Forward_Sortation_Area'] == selected_area, 'Total_Notifs']
+                title_text = f"Notification Count for {selected_area}: {area_value_ttlcount[0]}"
+            else:
+                area_value_percent = df_chart.loc[df_chart['Forward_Sortation_Area'] == selected_area, f"{selected_condition}_Percent"]
+                title_text = f"Percentage of Time Asbestos is found in {selected_condition} for {selected_area}: {area_value_percent[0]}%"
+            
+        chart_y_axis = 'Forward_Sortation_Area'
         if selected_condition == "All Conditions":
-            area_value = count_df.loc[count_df['Forward_Sortation_Area'] == selected_area, 'Counts']
-            area_value = area_value.iloc[0] if not area_value.empty else 0
-            title_text = f"Total Notifications in {selected_area}: <b>{area_value}</b>"
-        elif selected_condition == "Vermiculite":
-            area_value = count_df.loc[count_df['Forward_Sortation_Area'] == selected_area, 'Condition Percentage']
-            area_value = round(area_value.iloc[0], 2) if not area_value.empty else 0
-            title_text = f"Percentage where Vermiculite is Found for {selected_area}: <b>{area_value}%</b>"
+            chart_x_axis = 'Total_Notifs'
         else:
-            area_value = count_df.loc[count_df['Forward_Sortation_Area'] == selected_area, 'Condition Percentage']
-            area_value = round(area_value.iloc[0], 2) if not area_value.empty else 0
-            title_text = f"Percentage where Asbestos is Found in {selected_condition} in {selected_area}: <b>{area_value}%</b>"
-    
-    count_df['Highlight'] = count_df['Forward_Sortation_Area'].apply(lambda x: 'Selected' if x == selected_area else 'Other')
-    color_discrete_map = {'Selected': 'red', 'Other': 'blue'}
-    
-    fig = px.bar(count_df, x='Forward_Sortation_Area', y='Counts' if selected_condition in ["All Notifications", "All Conditions"] else 'Condition Percentage',
-                 title=title_text, color='Highlight', color_discrete_map=color_discrete_map, hover_name='Forward_Sortation_Area')
-    # Update bar borders to be black
-    fig.update_traces(marker_line_color='black', marker_line_width=1.2)
-    fig.update_layout(showlegend=False, xaxis={'tickfont': {'size': 10}})
-    
-    return fig
+            chart_x_axis = f"{selected_condition}_Percent"
+        
+        df_chart['Highlight'] = df_chart['Forward_Sortation_Area'].apply(lambda x: 'Selected' if x == selected_area else 'Other')
+        color_discrete_map = {'Selected': 'red', 'Other': 'blue'}
+        
+        fig = px.bar(df_chart, x=chart_x_axis, y=chart_y_axis, color='Highlight', color_discrete_map=color_discrete_map, title=title_text, 
+                    hover_name='Forward_Sortation_Area', hover_data=[f"{selected_condition}_Percent", f"Total_{selected_condition}"])
+        
+        
+        fig.update_traces(marker_line_color='black', marker_line_width=1.2)
+        fig.update_layout(showlegend=False, xaxis={'tickfont': {'size': 10}})
+        
+        return fig
+    except Exception as e:
+        print(f"Error creating chart: {e}")
+        return px.bar()
 
-def create_table(df, selected_area, selected_condition):
+def create_table(df, df2, selected_table_type, selected_area, selected_condition):
     """
     Creates a table representation of the filtered data.
 
@@ -128,19 +112,22 @@ def create_table(df, selected_area, selected_condition):
     list: A list of dictionaries representing the filtered data.
     """
     try:
-        filtered_df = filter_data(df, selected_area, selected_condition)
-
-        datetime_columns = ['startDate', 'endDate']
-        for col in datetime_columns:
-            if col in filtered_df.columns:
-                filtered_df[col] = pd.to_datetime(filtered_df[col]).dt.date
-
-        return filtered_df.to_dict('records')
+        if selected_table_type == "All Notifications":
+            filtered_df = filter_data(df, selected_area, selected_condition)
+            return filtered_df.to_dict('records')
+        elif selected_table_type == "Summary: Totals":
+            total_columns = ['Forward_Sortation_Area', 'Total_Notifs', 'Total_Vermiculite', 'Total_Piping', 'Total_Drywall', 'Total_Insulation', 'Total_Tiling', 'Total_Floor_Tiles', 'Total_Ceiling_Tiles', 'Total_Ducting', 'Total_Plaster', 'Total_Stucco_Stipple', 'Total_Fittings']
+            summary_df = df2[total_columns].copy()
+            return summary_df.to_dict('records')
+        else:
+            percentage_columns = ['Forward_Sortation_Area', 'Vermiculite_Percent', 'Piping_Percent', 'Drywall_Percent', 'Insulation_Percent', 'Tiling_Percent', 'Floor_Tiles_Percent', 'Ceiling_Tiles_Percent', 'Ducting_Percent', 'Plaster_Percent', 'Stucco_Stipple_Percent', 'Fittings_Percent']
+            percentage_df = df2[percentage_columns].copy()
+            return percentage_df.to_dict('records')
     except Exception as e:
         print(f"Error creating table: {e}")
         return []
 
-def create_map(df, selected_area, selected_condition):
+def create_map(df, df2, selected_map_type, selected_area, selected_condition):
     """
     Creates a map visualization of the filtered data.
 
@@ -152,77 +139,102 @@ def create_map(df, selected_area, selected_condition):
     Returns:
     plotly.graph_objs._figure.Figure: The generated map visualization.
     """
+    # Load the GeoJSON file
+    with open('GeoJSON_stuff/Polygons/output_geojson_manitoba_fsa.geojson') as f:
+        geojson_data = json.load(f)
     try:
-        if df.empty:
-            return px.scatter_mapbox(title="No data available")
-
-        filtered_df = filter_data(df, selected_area, selected_condition)
-
-        if filtered_df.empty:
-            return px.scatter_mapbox(title="No data available for the selected area")
-
-        filtered_df['Latitude'] = pd.to_numeric(filtered_df['Latitude'], errors='coerce')
-        filtered_df['Longitude'] = pd.to_numeric(filtered_df['Longitude'], errors='coerce')
-        filtered_df = filtered_df.dropna(subset=['Latitude', 'Longitude'])
-
-        if filtered_df.empty:
-            return px.scatter_mapbox(title="No valid geospatial data available")
-
-        center = {
-            "lat": filtered_df['Latitude'].median(),
-            "lon": filtered_df['Longitude'].median()
-        }
-
-        if selected_area == "All Areas":
-            if selected_condition == "All Conditions":
-                map_title = "All Areas - All Conditions"
+        if selected_map_type == "Density Heatmap":
+            filtered_df = filter_data(df, selected_area, selected_condition)
+            center = {
+                "lat": filtered_df['Latitude'].median(),
+                "lon": filtered_df['Longitude'].median()
+            }
+            if selected_area == "All Areas":
+                zoom = 12
             else:
-                map_title = f"All Areas - {selected_condition}"
-        else:
-            if selected_condition == "All Conditions":
-                map_title = f"{selected_area} - All Conditions"
-            else:
-                map_title = f"{selected_area} - {selected_condition}"
+                zoom = 10
+                
+            fig = px.density_mapbox(
+                filtered_df, lat='Latitude', lon='Longitude', 
+                z=1, center=center, zoom=zoom, mapbox_style="carto-positron",
+                hover_name='Forward_Sortation_Area')
+            fig.update_layout(
+                mapbox_accesstoken=MAPBOX_ACCESS_TOKEN,
+                margin={"r":0,"t":0,"l":0,"b":0},
+                mapbox_layers=[{
+                        "source": geojson_data,
+                        "type": "line",
+                        "opacity": 1,
+                        "color": "rgba(238, 180, 180, 10)",
+                    }])
+            return fig
         
-        # Use custom Mapbox style
-        custom_style_url = 'mapbox://styles/alexsala826/clx7vfhzb01f801qoh6xah2a9'  # Replace with your custom style URL
-        # Load the GeoJSON file
-        with open('output_geojson_manitoba_fsa.geojson') as f:
-            geojson_data = json.load(f)
-
-        fig = px.scatter_mapbox(
-            filtered_df,
-            lat='Latitude',
-            lon='Longitude',
-            hover_name='contractor',
-            hover_data=['formattedAddress', 'startDate', 'postalCode', 'confirmationNo'],
-            size_max=5,
-            zoom=10 if selected_area == "All Areas" else 12,
-            center=center,
-            title=map_title,
-        )
-
-        # Adjust opacity of the scatter points
-        fig.update_traces(marker={'opacity': 0.75})
-
-        # Use custom Mapbox style
-        # custom_style_url = 'mapbox://styles/alexsala826/clx7vfhzb01f801qoh6xah2a9'  # Replace with your custom style URL
-
-        fig.update_layout(
-            mapbox_style="streets",
-            mapbox_accesstoken=MAPBOX_ACCESS_TOKEN,
-            margin={"r": 0, "t": 0, "l": 0, "b": 0},
-            mapbox_layers=[
-                {
-                    "source": geojson_data,
-                    "type": "line",
-                    "below": "natural-labels",
-                    "opacity": 1,
-                    "color": "rgba(238, 180, 180, 10)",
-                }
-            ]
-        )
-        return fig
+        elif selected_map_type == "Choropleth Tile Map":   
+            choropleth_df = df2.copy()
+            center = {
+                "lat": 49.89106721862937,
+                "lon": -97.13086449579419
+            }
+            if selected_area == "All Areas":
+                zoom = 12
+            else:
+                zoom = 10
+            if selected_condition == "All Conditions":
+                color = 'Total_Notifs'
+            else:
+                color = f"{selected_condition}_Percent"
+            fsa_ids = geojson_data['features']['properties']['CFSAUID']
+            
+            fig = px.choropleth_mapbox(
+                choropleth_df, geojson=geojson_data, featureidkey=fsa_ids, 
+                locations='Forward_Sortation_Area', color=color, color_continuous_scale="Viridis", 
+                hover_name='Forward_Sortation_Area', zoom=zoom, center=center, 
+                mapbox_style="carto-positron")
+            fig.update_layout(
+                mapbox_accesstoken=MAPBOX_ACCESS_TOKEN,
+                margin={"r":0,"t":0,"l":0,"b":0},
+                mapbox_layers=[{
+                        "source": geojson_data,
+                        "type": "line",
+                        "opacity": 1,
+                        "color": "rgba(238, 180, 180, 10)",
+                    }])
+            return fig
+            
+        else:
+            filtered_df = filter_data(df, selected_area, selected_condition)
+            #filtered_df['Latitude'] = pd.to_numeric(filtered_df['Latitude'], errors='coerce')
+            #filtered_df['Longitude'] = pd.to_numeric(filtered_df['Longitude'], errors='coerce')
+            #filtered_df = filtered_df.dropna(subset=['Latitude', 'Longitude'])
+            center = {
+                "lat": filtered_df['Latitude'].median(),
+                "lon": filtered_df['Longitude'].median()
+            }
+            fig = px.scatter_mapbox(
+                filtered_df,
+                lat='Latitude',
+                lon='Longitude',
+                hover_name='contractor',
+                hover_data=['formattedAddress', 'startDate', 'postalCode', 'confirmationNo'],
+                size_max=5,
+                zoom=10 if selected_area == "All Areas" else 12,
+                center=center,
+            )
+            # Adjust opacity of the scatter points
+            fig.update_traces(marker={'opacity': 0.75})
+            fig.update_layout(
+                mapbox_style="streets",
+                mapbox_accesstoken=MAPBOX_ACCESS_TOKEN,
+                margin={"r": 0, "t": 0, "l": 0, "b": 0},
+                mapbox_layers=[{
+                        "source": geojson_data,
+                        "type": "line",
+                        "below": "natural-labels",
+                        "opacity": 1,
+                        "color": "rgba(238, 180, 180, 10)",
+                    }])
+            return fig
+        
     except Exception as e:
         print(f"Error creating map: {e}")
         return px.scatter_mapbox(title="Error creating map")

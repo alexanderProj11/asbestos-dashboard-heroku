@@ -9,8 +9,8 @@ def reproject_geometry(geometry, src_crs, dest_crs):
     return transform(project, geometry)
 
 # File paths
-input_shapefile = 'Shapefile/lfsa000a16a_e.shp'
-output_geojson = 'output_geojson_allcanada_fsa.geojson'
+input_shapefile = 'GeoJSON_stuff/Shapefile/lfsa000a16a_e.shp'
+output_geojson = 'output_geojson_manitoba_fsa.geojson'
 
 # Read the shapefile
 gdf = gpd.read_file(input_shapefile)

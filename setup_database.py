@@ -46,11 +46,6 @@ def create_engine_and_tables(file_path_1, file_path_2, database_url):
             'Ducting', 'Plaster', 'Stucco_Stipple', 'Fittings', 'Forward_Sortation_Area'
         ]
         
-        chart_table_columns = [
-            'Forward_Sortation_Area', 'startDate', 'confirmationNo', 'Vermiculite', 'Piping', 'Drywall',
-            'Insulation', 'Tiling', 'Floor_Tiles', 'Ceiling_Tiles', 'Ducting', 'Plaster',
-            'Stucco_Stipple', 'Fittings'
-        ]
 
         # Create or replace general table
         df.to_sql('asbestos_data', engine, index=False, if_exists='replace', method='multi')
@@ -58,7 +53,6 @@ def create_engine_and_tables(file_path_1, file_path_2, database_url):
         # Create or replace special tables
         df[map_table_columns].to_sql('map_table', engine, index=False, if_exists='replace', method='multi')
         df[data_table_columns].to_sql('data_table', engine, index=False, if_exists='replace', method='multi')
-        df[chart_table_columns].to_sql('chart_table', engine, index=False, if_exists='replace', method='multi')
         
         df2.to_sql('aggregated_fsa_table', engine, index=False, if_exists='replace', method='multi')
         

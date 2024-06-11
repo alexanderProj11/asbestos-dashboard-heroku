@@ -52,6 +52,31 @@ page_1_layout = html.Div(
         html.Div(
             style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': '10px', 'border': '3px solid white', 'marginBottom': '10px'},
             children=[
+                dcc.RadioItems(
+                    id='selected_map_type',
+                    options=[{
+                            "label":
+                                [
+                                    html.Img(src="image_files/heatmap_icon.png", height=30),
+                                    html.Span("Density Heatmap", style={'font-size': 15, 'padding-left': 10}),
+                                ],
+                            "value": "Density Heatmap"},
+                        {
+                            "label":
+                                [
+                                    html.Img(src="image_files/choropleth_icon.png", height=30),
+                                    html.Span("Choropleth Tile Map", style={'font-size': 15, 'padding-left': 10}),
+                                ], 
+                            "value": "Choropleth Tile Map"},
+                        {
+                            "label":
+                                [
+                                    html.Img(src="image_files/scatter_icon.png", height=30),
+                                    html.Span("Point Scatter Map", style={'font-size': 15, 'padding-left': 10}),
+                                ],
+                            "value": "Point Scatter Map"}], 
+                    labelStyle={"display": "flex", "align-items": "center"},
+                ),
                 dcc.Graph(id='map-plot', style=STYLE_CONFIG['graph'])
             ]
         ),
@@ -149,6 +174,31 @@ page_3_layout = html.Div(
         html.Div(
             style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': '10px', 'border': '3px solid white', 'marginBottom': '10px'},
             children=[
+                dcc.RadioItems(
+                    id='selected_map_type',
+                    options=[{
+                            "label":
+                                [
+                                    html.Img(src="image_files/heatmap_icon.png", height=30),
+                                    html.Span("Density Heatmap", style={'font-size': 15, 'padding-left': 10}),
+                                ],
+                            "value": "Density Heatmap"},
+                        {
+                            "label":
+                                [
+                                    html.Img(src="image_files/choropleth_icon.png", height=30),
+                                    html.Span("Choropleth Tile Map", style={'font-size': 15, 'padding-left': 10}),
+                                ], 
+                            "value": "Choropleth Tile Map"},
+                        {
+                            "label":
+                                [
+                                    html.Img(src="image_files/scatter_icon.png", height=30),
+                                    html.Span("Point Scatter Map", style={'font-size': 15, 'padding-left': 10}),
+                                ],
+                            "value": "Point Scatter Map"}], 
+                    labelStyle={"display": "flex", "align-items": "center"},
+                ),                
                 dcc.Graph(id='map-plot', style=STYLE_CONFIG['graph'])
             ]
         ),
@@ -242,7 +292,7 @@ def register_callbacks(app):
         if pathname not in ['/bar-chart', '/']:
             raise PreventUpdate
         try:
-            df_chart = fetch_data('chart_table')
+            df_chart = fetch_data('aggregated_fsa_table')
             chart = create_chart(df_chart, selected_area, selected_condition)
             return chart
         except Exception as e:
@@ -252,7 +302,8 @@ def register_callbacks(app):
     @app.callback(
         Output('map-plot', 'figure'),
         [Input('area-dropdown', 'value'), Input('condition-dropdown', 'value')],
-        [Input('url', 'pathname')]
+        [Input('url', 'pathname')],
+        [Input('selected_map_type', 'value')]
     )
     def update_map(selected_area, selected_condition, pathname):
         if pathname not in ['/map', '/']:
