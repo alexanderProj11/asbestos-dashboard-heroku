@@ -8,3 +8,6 @@ gunicorn
 python-dotenv
 psycopg2
 psycopg
+geopandas
+pyproj
+shapely
