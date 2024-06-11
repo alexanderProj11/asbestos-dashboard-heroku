@@ -25,9 +25,9 @@ def get_database_url():
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://")
     return DATABASE_URL
 
-def get_csv_file_path():
+def get_csv_file_path_1():
     """
-    Get the CSV file path from the environment variables.
+    Get the first CSV file path from the environment variables.
 
     Parameters:
     None
@@ -35,8 +35,22 @@ def get_csv_file_path():
     Returns:
     file_path (str): The CSV file path.
     """
-    file_path = os.getenv('CSV_FILE_PATH')
+    file_path = os.getenv('CSV_FILE_PATH_1')
     return file_path
+
+def get_csv_file_path_2():
+    """
+    Get the second CSV file path from the environment variables.
+
+    Parameters:
+    None
+
+    Returns:
+    file_path (str): The CSV file path.
+    """
+    file_path = os.getenv('CSV_FILE_PATH_2')
+    return file_path
+
 
 # Dropdown options
 AREA_DROPDOWN_OPTIONS = [{'label': 'All Areas', 'value': 'All Areas'}]
