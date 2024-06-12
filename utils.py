@@ -96,12 +96,22 @@ def create_chart(df, selected_area, selected_condition):
             print("No data matches the selected criteria.")
             return px.bar(title="No data available for the selected criteria.")
         
-        df_chart = df_chart.sort_values(by='Forward_Sortation_Area')
-        df_chart[f"{selected_condition}_Percent"] = df_chart[f"{selected_condition}_Percent"].astype(float)
+        if selected_condition != "All Conditions":
+            # Remove the percentage symbol from the string in data
+            df_chart[f"{selected_condition}_Percent"] = df_chart[f"{selected_condition}_Percent"].str.rstrip('%').astype(float)
+            max_val = df_chart[chart_y_axis].max()
+            min_val = df_chart[chart_y_axis].min()
+            tickvals = np.arange(min_val, max_val + 5, 5)
+        
         fig = px.bar(df_chart, x=chart_x_axis, y=chart_y_axis, color='Highlight', color_discrete_map=color_discrete_map, title=title_text, 
                     hover_name='Forward_Sortation_Area')
         
-        
+        if selected_condition != "All Conditions":
+            # Add percentage symbol to y-axis labels
+            fig.update_yaxes(tickvals=tickvals)
+            # Add percent symbol to y-axis tick values
+            fig.update_layout(yaxis_tickvals=list(fig.layout.yaxis.tickvals), yaxis_ticktext=[f'{tickval}%' for tickval in fig.layout.yaxis.tickvals])
+            
         fig.update_traces(marker_line_color='black', marker_line_width=1.2)
         fig.update_layout(showlegend=False, xaxis={'tickfont': {'size': 10}})
 
