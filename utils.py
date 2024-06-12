@@ -175,14 +175,14 @@ def create_map(df, df2, selected_map, selected_area, selected_condition):
 
     try:
         if selected_map == "Density Heatmap":
-            fig = create_density_heatmap(filtered_df, selected_area)
+            fig = create_density_heatmap(filtered_df, selected_area, selected_condition)
         elif selected_map == "Choropleth Tile Map":
             fig = create_choropleth_map(df2, geojson_data, selected_area, selected_condition)
         else:  # Scatter Map
-            fig = create_scatter_map(filtered_df, geojson_data, selected_area)
+            fig = create_scatter_map(filtered_df, geojson_data, selected_area, selected_condition)
                 
-        # Add a unique identifier to the figure's layout to force a re-render
-        unique_id = time.time()  # Using current timestamp as a unique identifier
+        # Set uirevision based on selection criteria
+        unique_id = f"{selected_area}_{selected_condition}"
         fig.update_layout(uirevision=unique_id)
         
         return fig
@@ -191,7 +191,7 @@ def create_map(df, df2, selected_map, selected_area, selected_condition):
         print(f"Error creating map: {e}")
         return px.scatter_mapbox(title="Error creating map")
 
-def create_density_heatmap(filtered_df, selected_area):
+def create_density_heatmap(filtered_df, selected_area, selected_condition):
     center = {
         "lat": filtered_df['Latitude'].median(),
         "lon": filtered_df['Longitude'].median()
@@ -199,16 +199,16 @@ def create_density_heatmap(filtered_df, selected_area):
     zoom = 10 if selected_area == "All Areas" else 12
 
     fig = px.density_mapbox(
-        filtered_df, lat='Latitude', lon='Longitude',
-        z='Density', radius=10, center=center, zoom=zoom, mapbox_style="carto-positron",
+        filtered_df, lat='Latitude', lon='Longitude', color_continuous_scale='plasma',
+        z='Density', radius=30, center=center, zoom=zoom, mapbox_style="carto-positron",
         hover_name='Forward_Sortation_Area'
     )
     fig.update_layout(
         mapbox_accesstoken=MAPBOX_ACCESS_TOKEN,
         margin={"r": 0, "t": 0, "l": 0, "b": 0}
     )
-    # Add a unique identifier to the figure's layout to force a re-render
-    unique_id = time.time()  # Using current timestamp as a unique identifier
+    # Set uirevision based on selection criteria
+    unique_id = f"{selected_area}_{selected_condition}"
     fig.update_layout(uirevision=unique_id)
     
     return fig
@@ -219,12 +219,18 @@ def create_choropleth_map(df2, geojson_data, selected_area, selected_condition):
         "lat": 49.89106721862937,
         "lon": -97.13086449579419
     }
-    zoom = 12 if selected_area == "All Areas" else 10
-    color = 'Total_Notifs' if selected_condition == "All Conditions" else f"{selected_condition}_Percent"
+    if selected_condition != "All Conditions":
+        # Remove the percentage symbol from the string in data
+        choropleth_df[f"{selected_condition}_Percent"] = choropleth_df[f"{selected_condition}_Percent"].str.rstrip('%').astype(float)
+        color = f"{selected_condition}_Percent"
+    else:
+        color = 'Total_Notifs'
+
+    zoom = 12
 
     fig = px.choropleth_mapbox(
         choropleth_df, geojson=geojson_data, featureidkey="properties.CFSAUID",
-        locations='Forward_Sortation_Area', color=color, color_continuous_scale="Viridis",
+        locations='Forward_Sortation_Area', color=color, color_continuous_scale="rdbu_r",
         hover_name='Forward_Sortation_Area', zoom=zoom, center=center,
         mapbox_style="carto-positron",
     )
@@ -238,12 +244,13 @@ def create_choropleth_map(df2, geojson_data, selected_area, selected_condition):
             "color": "rgba(238, 180, 180, 10)",
         }]
     )
-    # Add a unique identifier to the figure's layout to force a re-render
-    unique_id = time.time()  # Using current timestamp as a unique identifier
+    # Set uirevision based on selection criteria
+    unique_id = f"{selected_area}_{selected_condition}"
     fig.update_layout(uirevision=unique_id)
+    fig.update_layout(uirevision=time.time())
     return fig
 
-def create_scatter_map(filtered_df, geojson_data, selected_area):
+def create_scatter_map(filtered_df, geojson_data, selected_area, selected_condition):
     center = {
         "lat": filtered_df['Latitude'].median(),
         "lon": filtered_df['Longitude'].median()
@@ -272,8 +279,8 @@ def create_scatter_map(filtered_df, geojson_data, selected_area):
             "color": "rgba(238, 180, 180, 10)",
         }]
     )
-    # Add a unique identifier to the figure's layout to force a re-render
-    unique_id = time.time()  # Using current timestamp as a unique identifier
-    fig.update_layout(uirevision=unique_id)    
+    # Set uirevision based on selection criteria
+    unique_id = f"{selected_area}_{selected_condition}"
+    fig.update_layout(uirevision=unique_id)
     
     return fig
