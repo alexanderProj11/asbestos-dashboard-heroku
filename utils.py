@@ -238,22 +238,6 @@ def create_choropleth_map(df2, geojson_data, selected_area, selected_condition):
             "color": "rgba(238, 180, 180, 10)",
         }]
     )
-    # Before returning the fig, add an annotation
-    filter_info = f"Filtering by [Area: {selected_area}, Condition: {selected_condition}]"
-    fig.add_annotation(
-        text=filter_info,  # The text to display
-        align='right',
-        showarrow=False,
-        xref='paper',  # 'paper' refers to the whole figure
-        yref='paper',
-        x=1,  # 1 is the far right of the figure
-        y=1,  # 1 is the top of the figure
-        bordercolor='black',
-        borderwidth=1,
-        bgcolor='white',
-        xanchor='right',
-        yanchor='top'
-    )
     # Add a unique identifier to the figure's layout to force a re-render
     unique_id = time.time()  # Using current timestamp as a unique identifier
     fig.update_layout(uirevision=unique_id)
