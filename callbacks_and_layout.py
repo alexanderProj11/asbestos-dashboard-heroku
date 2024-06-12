@@ -291,6 +291,7 @@ page_4_layout = html.Div(
                                 ],
                             "value": "Percentages"}],    
                     labelStyle={"display": "flex", "align-items": "center"},
+                    value="Notifications"
                 ),                
                 dash_table.DataTable(
                     id='pivot-table',

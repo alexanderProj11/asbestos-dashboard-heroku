@@ -11,3 +11,5 @@ psycopg
 geopandas
 pyproj
 shapely
+numpy
+scipy

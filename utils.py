@@ -4,6 +4,8 @@ from database import engine
 import os
 import json
 from config import load_config
+import numpy as np
+from scipy.spatial import cKDTree
 
 MAPBOX_ACCESS_TOKEN = load_config()
 
@@ -63,7 +65,9 @@ def create_chart(df, selected_area, selected_condition):
     plotly.graph_objs._figure.Figure: The generated bar chart.
     """
     try:
+        
         df_chart = df.copy()
+        df_chart = df_chart[df_chart['Forward_Sortation_Area'] != 'Overall']
         
         if selected_area == "All Areas":
             if selected_condition == "All Conditions":
@@ -78,17 +82,17 @@ def create_chart(df, selected_area, selected_condition):
                 area_value_percent = df_chart.loc[df_chart['Forward_Sortation_Area'] == selected_area, f"{selected_condition}_Percent"]
                 title_text = f"Percentage of Time Asbestos is found in {selected_condition} for {selected_area}: {area_value_percent[0]}%"
             
-        chart_y_axis = 'Forward_Sortation_Area'
+        chart_x_axis = 'Forward_Sortation_Area'
         if selected_condition == "All Conditions":
-            chart_x_axis = 'Total_Notifs'
+            chart_y_axis = 'Total_Notifs'
         else:
-            chart_x_axis = f"{selected_condition}_Percent"
+            chart_y_axis = f"{selected_condition}_Percent"
         
         df_chart['Highlight'] = df_chart['Forward_Sortation_Area'].apply(lambda x: 'Selected' if x == selected_area else 'Other')
         color_discrete_map = {'Selected': 'red', 'Other': 'blue'}
         
         fig = px.bar(df_chart, x=chart_x_axis, y=chart_y_axis, color='Highlight', color_discrete_map=color_discrete_map, title=title_text, 
-                    hover_name='Forward_Sortation_Area', hover_data=[f"{selected_condition}_Percent", f"Total_{selected_condition}"])
+                    hover_name='Forward_Sortation_Area')
         
         
         fig.update_traces(marker_line_color='black', marker_line_width=1.2)
@@ -112,10 +116,10 @@ def create_table(df, df2, selected_table_type, selected_area, selected_condition
     list: A list of dictionaries representing the filtered data.
     """
     try:
-        if selected_table_type == "All Notifications":
+        if selected_table_type == "Notifications":
             filtered_df = filter_data(df, selected_area, selected_condition)
             return filtered_df.to_dict('records')
-        elif selected_table_type == "Summary: Totals":
+        elif selected_table_type == "Totals":
             total_columns = ['Forward_Sortation_Area', 'Total_Notifs', 'Total_Vermiculite', 'Total_Piping', 'Total_Drywall', 'Total_Insulation', 'Total_Tiling', 'Total_Floor_Tiles', 'Total_Ceiling_Tiles', 'Total_Ducting', 'Total_Plaster', 'Total_Stucco_Stipple', 'Total_Fittings']
             summary_df = df2[total_columns].copy()
             return summary_df.to_dict('records')
@@ -126,6 +130,7 @@ def create_table(df, df2, selected_table_type, selected_area, selected_condition
     except Exception as e:
         print(f"Error creating table: {e}")
         return []
+
 
 def create_map(df, df2, selected_map_type, selected_area, selected_condition):
     """
@@ -139,6 +144,7 @@ def create_map(df, df2, selected_map_type, selected_area, selected_condition):
     Returns:
     plotly.graph_objs._figure.Figure: The generated map visualization.
     """
+    
     # Load the GeoJSON file
     with open('GeoJSON_stuff/Polygons/output_geojson_manitoba_fsa.geojson') as f:
         geojson_data = json.load(f)
@@ -156,7 +162,7 @@ def create_map(df, df2, selected_map_type, selected_area, selected_condition):
                 
             fig = px.density_mapbox(
                 filtered_df, lat='Latitude', lon='Longitude', 
-                z=1, center=center, zoom=zoom, mapbox_style="carto-positron",
+                z='Density', center=center, zoom=zoom, mapbox_style="carto-positron",
                 hover_name='Forward_Sortation_Area')
             fig.update_layout(
                 mapbox_accesstoken=MAPBOX_ACCESS_TOKEN,
