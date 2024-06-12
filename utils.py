@@ -208,7 +208,8 @@ def create_density_heatmap(filtered_df, selected_area, selected_condition):
         margin={"r": 0, "t": 0, "l": 0, "b": 0}
     )
     # Set uirevision based on selection criteria
-    unique_id = f"{selected_area}_{selected_condition}"
+    clocktime = time.strftime('%H:%M:%S')
+    unique_id = f"{selected_area}_{selected_condition}_{clocktime}"
     fig.update_layout(uirevision=unique_id)
     
     return fig
@@ -245,9 +246,9 @@ def create_choropleth_map(df2, geojson_data, selected_area, selected_condition):
         }]
     )
     # Set uirevision based on selection criteria
-    unique_id = f"{selected_area}_{selected_condition}"
+    clocktime = time.strftime('%H:%M:%S')
+    unique_id = f"{selected_area}_{selected_condition}_{clocktime}"
     fig.update_layout(uirevision=unique_id)
-    fig.update_layout(uirevision=time.time())
     return fig
 
 def create_scatter_map(filtered_df, geojson_data, selected_area, selected_condition):
@@ -280,7 +281,8 @@ def create_scatter_map(filtered_df, geojson_data, selected_area, selected_condit
         }]
     )
     # Set uirevision based on selection criteria
-    unique_id = f"{selected_area}_{selected_condition}"
+    clocktime = time.strftime('%H:%M:%S')
+    unique_id = f"{selected_area}_{selected_condition}_{clocktime}"
     fig.update_layout(uirevision=unique_id)
     
     return fig
