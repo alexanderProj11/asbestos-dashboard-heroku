@@ -54,32 +54,15 @@ page_1_layout = html.Div(
         html.Div(
             style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': '10px', 'border': '3px solid white', 'marginBottom': '10px'},
             children=[
-                dcc.RadioItems(
-                    id='map-radioitem',
-                    inline=True,
-                    options=[{
-                            "label":
-                                [
-                                    html.Img(src="image_files/heatmap_icon.png", height=iconHeight),
-                                    html.Span("Density Heatmap", style={'font-size': 15, 'padding-left': 10}),
-                                ],
-                            "value": "Density Heatmap"},
-                        {
-                            "label":
-                                [
-                                    html.Img(src="image_files/choropleth_icon.png", height=iconHeight),
-                                    html.Span("Choropleth Tile Map", style={'font-size': 15, 'padding-left': 10}),
-                                ], 
-                            "value": "Choropleth Tile Map"},
-                        {
-                            "label":
-                                [
-                                    html.Img(src="image_files/scatter_icon.png", height=iconHeight),
-                                    html.Span("Point Scatter Map", style={'font-size': 15, 'padding-left': 10}),
-                                ],
-                            "value": "Point Scatter Map"}], 
-                    labelStyle={"display": "flex", "align-items": "center"},
-                    value='Point Scatter Map'
+                dcc.Dropdown(
+                    id='map-dropdown',
+                    options=[
+                        {"label": "Density Heatmap", "value": "Density Heatmap"},
+                        {"label": "Choropleth Tile Map", "value": "Choropleth Tile Map"},
+                        {"label": "Point Scatter Map", "value": "Point Scatter Map"}
+                    ],
+                    value='Point Scatter Map',
+                    style=STYLE_CONFIG['dropdown']
                 ),
                 dcc.Graph(id='map-plot', style=STYLE_CONFIG['graph'])
             ]
@@ -87,32 +70,15 @@ page_1_layout = html.Div(
         html.Div(
             style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': '10px', 'border': '3px solid white', 'marginBottom': '10px'},
             children=[
-                dcc.RadioItems(
-                    id='table-radioitem',
-                    inline=True,
-                    options=[{
-                            "label":
-                                [
-                                    html.Img(src="image_files/circlearrows3_icon.png", height=iconHeight),
-                                    html.Span("Notifications", style={'font-size': 15, 'padding-left': 10}),
-                                ],
-                            "value": "Notifications"},
-                        {
-                            "label":
-                                [
-                                    html.Img(src="image_files/pivot_icon.png", height=iconHeight),
-                                    html.Span("Totals", style={'font-size': 15, 'padding-left': 10}),
-                                ], 
-                            "value": "Totals"},
-                        {
-                            "label":
-                                [
-                                    html.Img(src="image_files/percent_icon.png", height=iconHeight),
-                                    html.Span("Percentages", style={'font-size': 15, 'padding-left': 10}),
-                                ],
-                            "value": "Percentages"}],    
-                    labelStyle={"display": "flex", "align-items": "center"},
-                    value='Notifications'
+                dcc.Dropdown(
+                    id='table-dropdown',
+                    options=[
+                        {"label": "Notifications", "value": "Notifications"},
+                        {"label": "Totals", "value": "Totals"},
+                        {"label": "Percentages", "value": "Percentages"}
+                    ],
+                    value='Notifications',
+                    style=STYLE_CONFIG['dropdown']
                 ),
                 dash_table.DataTable(
                     id='pivot-table',
@@ -205,31 +171,15 @@ page_3_layout = html.Div(
         html.Div(
             style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': '10px', 'border': '3px solid white', 'marginBottom': '10px'},
             children=[
-                dcc.RadioItems(
-                    id='map-radioitem',
-                    options=[{
-                            "label":
-                                [
-                                    html.Img(src="image_files/heatmap_icon.png", height=iconHeight),
-                                    html.Span("Density Heatmap", style={'font-size': 15, 'padding-left': 10}),
-                                ],
-                            "value": "Density Heatmap"},
-                        {
-                            "label":
-                                [
-                                    html.Img(src="image_files/choropleth_icon.png", height=iconHeight),
-                                    html.Span("Choropleth Tile Map", style={'font-size': 15, 'padding-left': 10}),
-                                ], 
-                            "value": "Choropleth Tile Map"},
-                        {
-                            "label":
-                                [
-                                    html.Img(src="image_files/scatter_icon.png", height=iconHeight),
-                                    html.Span("Point Scatter Map", style={'font-size': 15, 'padding-left': 10}),
-                                ],
-                            "value": "Point Scatter Map"}], 
-                    labelStyle={"display": "flex", "align-items": "center"},
-                    value='Point Scatter Map'
+                dcc.Dropdown(
+                    id='map-dropdown',
+                    options=[
+                        {"label": "Density Heatmap", "value": "Density Heatmap"},
+                        {"label": "Choropleth Tile Map", "value": "Choropleth Tile Map"},
+                        {"label": "Point Scatter Map", "value": "Point Scatter Map"}
+                    ],
+                    value='Point Scatter Map',
+                    style=STYLE_CONFIG['dropdown']
                 ),                
                 dcc.Graph(id='map-plot', style=STYLE_CONFIG['graph'])
             ]
@@ -271,32 +221,15 @@ page_4_layout = html.Div(
         html.Div(
             style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': '10px', 'border': '3px solid white', 'marginBottom': '10px'},
             children=[
-                dcc.RadioItems(
-                    id='table-radioitem',
-                    inline=True,
-                    options=[{
-                            "label":
-                                [
-                                    html.Img(src="image_files/circlearrows3_icon.png", height=iconHeight),
-                                    html.Span("Notifications", style={'font-size': 15, 'padding-left': 10}),
-                                ],
-                            "value": "Notifications"},
-                        {
-                            "label":
-                                [
-                                    html.Img(src="image_files/pivot_icon.png", height=iconHeight),
-                                    html.Span("Totals", style={'font-size': 15, 'padding-left': 10}),
-                                ], 
-                            "value": "Totals"},
-                        {
-                            "label":
-                                [
-                                    html.Img(src="image_files/percent_icon.png", height=iconHeight),
-                                    html.Span("Percentages", style={'font-size': 15, 'padding-left': 10}),
-                                ],
-                            "value": "Percentages"}],    
-                    labelStyle={"display": "flex", "align-items": "center"},
-                    value="Notifications"
+                dcc.Dropdown(
+                    id='table-dropdown',
+                    options=[
+                        {"label": "Notifications", "value": "Notifications"},
+                        {"label": "Totals", "value": "Totals"},
+                        {"label": "Percentages", "value": "Percentages"}
+                    ],
+                    value='Notifications',
+                    style=STYLE_CONFIG['dropdown']
                 ),                
                 dash_table.DataTable(
                     id='pivot-table',
@@ -360,8 +293,7 @@ def register_callbacks(app):
 
     @app.callback(
         Output('map-plot', 'figure'),
-        [Input('area-dropdown', 'value'), Input('condition-dropdown', 'value'), Input('map-radioitem', 'value')],
-        [Input('url', 'pathname')]
+        [Input('area-dropdown', 'value'), Input('condition-dropdown', 'value'), Input('map-dropdown', 'value'), Input('url', 'pathname')]
     )
     def update_map(selected_area, selected_condition, selected_map, pathname):
         if pathname not in ['/map', '/']:
@@ -377,8 +309,7 @@ def register_callbacks(app):
 
     @app.callback(
         Output('pivot-table', 'data'),
-        [Input('area-dropdown', 'value'), Input('condition-dropdown', 'value'), Input('table-radioitem', 'value')],
-        [Input('url', 'pathname')]
+        [Input('area-dropdown', 'value'), Input('condition-dropdown', 'value'), Input('table-dropdown', 'value'), Input('url', 'pathname')]
     )
     def update_table(selected_area, selected_condition, selected_table, pathname):
         if pathname not in ['/data-table', '/']:
