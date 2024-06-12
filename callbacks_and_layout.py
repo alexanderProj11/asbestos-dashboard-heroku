@@ -54,6 +54,7 @@ page_1_layout = html.Div(
             children=[
                 dcc.RadioItems(
                     id='selected_map_type',
+                    inline=True,
                     options=[{
                             "label":
                                 [
@@ -83,6 +84,32 @@ page_1_layout = html.Div(
         html.Div(
             style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': '10px', 'border': '3px solid white', 'marginBottom': '10px'},
             children=[
+                dcc.RadioItems(
+                    id='selected_table_type',
+                    inline=True,
+                    options=[{
+                            "label":
+                                [
+                                    html.Img(src="image_files/circlearrows3_icon.png", height=30),
+                                    html.Span("Notifications", style={'font-size': 15, 'padding-left': 10}),
+                                ],
+                            "value": "Notifications"},
+                        {
+                            "label":
+                                [
+                                    html.Img(src="image_files/pivot_icon.png", height=30),
+                                    html.Span("Totals", style={'font-size': 15, 'padding-left': 10}),
+                                ], 
+                            "value": "Totals"},
+                        {
+                            "label":
+                                [
+                                    html.Img(src="image_files/percent_icon.png", height=30),
+                                    html.Span("Percentages", style={'font-size': 15, 'padding-left': 10}),
+                                ],
+                            "value": "Percentages"}],    
+                    labelStyle={"display": "flex", "align-items": "center"},
+                ),
                 dash_table.DataTable(
                     id='pivot-table',
                     style_table=STYLE_CONFIG['table'],
@@ -239,6 +266,32 @@ page_4_layout = html.Div(
         html.Div(
             style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': '10px', 'border': '3px solid white', 'marginBottom': '10px'},
             children=[
+                dcc.RadioItems(
+                    id='selected_table_type',
+                    inline=True,
+                    options=[{
+                            "label":
+                                [
+                                    html.Img(src="image_files/circlearrows3_icon.png", height=30),
+                                    html.Span("Notifications", style={'font-size': 15, 'padding-left': 10}),
+                                ],
+                            "value": "Notifications"},
+                        {
+                            "label":
+                                [
+                                    html.Img(src="image_files/pivot_icon.png", height=30),
+                                    html.Span("Totals", style={'font-size': 15, 'padding-left': 10}),
+                                ], 
+                            "value": "Totals"},
+                        {
+                            "label":
+                                [
+                                    html.Img(src="image_files/percent_icon.png", height=30),
+                                    html.Span("Percentages", style={'font-size': 15, 'padding-left': 10}),
+                                ],
+                            "value": "Percentages"}],    
+                    labelStyle={"display": "flex", "align-items": "center"},
+                ),                
                 dash_table.DataTable(
                     id='pivot-table',
                     style_table=STYLE_CONFIG['table'],
@@ -305,12 +358,13 @@ def register_callbacks(app):
         [Input('url', 'pathname')],
         [Input('selected_map_type', 'value')]
     )
-    def update_map(selected_area, selected_condition, pathname):
+    def update_map(selected_area, selected_condition, pathname, selected_map_type):
         if pathname not in ['/map', '/']:
             raise PreventUpdate
         try:
             df_map = fetch_data('map_table')
-            map_plot = create_map(df_map, selected_area, selected_condition)
+            df_map_summary = fetch_data('aggregated_fsa_table')
+            map_plot = create_map(df_map, df_map_summary, selected_map_type, selected_area, selected_condition)
             return map_plot
         except Exception as e:
             print(f"Error in update_map: {e}")
@@ -319,14 +373,16 @@ def register_callbacks(app):
     @app.callback(
         Output('pivot-table', 'data'),
         [Input('area-dropdown', 'value'), Input('condition-dropdown', 'value')],
-        [Input('url', 'pathname')]
+        [Input('url', 'pathname')],
+        [Input('selected_table_type', 'value')]
     )
-    def update_table(selected_area, selected_condition, pathname):
+    def update_table(selected_area, selected_condition, pathname, selected_table_type):
         if pathname not in ['/data-table', '/']:
             raise PreventUpdate
         try:
             df_table = fetch_data('data_table')
-            table_data = create_table(df_table, selected_area, selected_condition)
+            df_table_summary = fetch_data('aggregated_fsa_table')
+            table_data = create_table(df_table, df_table_summary, selected_table_type, selected_area, selected_condition)
             return table_data
         except Exception as e:
             print(f"Error in update_table: {e}")

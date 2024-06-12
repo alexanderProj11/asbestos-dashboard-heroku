@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from dotenv import load_dotenv
 import logging
-from config import get_database_url, get_csv_file_path_1, get_csv_file_path_2, get_csv_file_path_3
+from config import get_database_url, get_csv_file_path_1, get_csv_file_path_2
 
 # Load environment variables from a .env file
 load_dotenv()
@@ -19,7 +19,7 @@ def create_engine_and_tables(file_path_1, file_path_2, database_url):
     Parameters:
     file_path_1 (str): The path to the CSV file containing the overall data.
     file_path_2 (str): The path to the CSV file containing the FSA-summarized data.
-    file_path_3 (str): The path to the CSV file containing the FSA percentage data.
+    
     database_url (str): The database URL for creating the SQLAlchemy engine.
 
     Returns:
