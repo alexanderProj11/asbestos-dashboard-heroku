@@ -81,14 +81,13 @@ def create_chart(df, selected_area, selected_condition):
                 title_text = f"Notification Count for {selected_area}: {area_value_ttlcount[0]}"
             else:
                 area_value_percent = df_chart.loc[df_chart['Forward_Sortation_Area'] == selected_area, f"{selected_condition}_Percent"].values
-                title_text = f"Percentage of Time Asbestos is found in {selected_condition} for {selected_area}: {area_value_percent[0]}%"
+                title_text = f"Percentage of Time Asbestos is found in {selected_condition} for {selected_area}: {area_value_percent[0]}"
             
         chart_x_axis = 'Forward_Sortation_Area'
         chart_y_axis = 'Total_Notifs'
         if selected_condition != "All Conditions":
             chart_y_axis = f"{selected_condition}_Percent"
 
-        df_chart = df_chart.sort_values(by='Forward_Sortation_Area')
         df_chart['Highlight'] = df_chart['Forward_Sortation_Area'].apply(lambda x: 'Selected' if x == selected_area else 'Other')
         color_discrete_map = {'Selected': 'red', 'Other': 'blue'}
         
@@ -98,15 +97,16 @@ def create_chart(df, selected_area, selected_condition):
             return px.bar(title="No data available for the selected criteria.")
         
         df_chart = df_chart.sort_values(by='Forward_Sortation_Area')
+        df_chart[f"{selected_condition}_Percent"] = df_chart[f"{selected_condition}_Percent"].astype(float)
         fig = px.bar(df_chart, x=chart_x_axis, y=chart_y_axis, color='Highlight', color_discrete_map=color_discrete_map, title=title_text, 
                     hover_name='Forward_Sortation_Area')
         
         
         fig.update_traces(marker_line_color='black', marker_line_width=1.2)
         fig.update_layout(showlegend=False, xaxis={'tickfont': {'size': 10}})
-        if chart_y_axis.endswith("_Percent"):
-            fig.update_yaxes(range=[0, 100])
+
         return fig
+    
     except Exception as e:
         print(f"Error creating chart: {e}")
         return px.bar()
