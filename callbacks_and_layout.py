@@ -5,6 +5,8 @@ from dash.dependencies import Input, Output
 from utils import fetch_data
 from config import AREA_DROPDOWN_OPTIONS, CONDITION_DROPDOWN_OPTIONS, STYLE_CONFIG
 
+iconHeight = 20
+
 # Fetch area options
 try:
     area_options = AREA_DROPDOWN_OPTIONS + [{'label': i, 'value': i} for i in fetch_data('asbestos_data')['Forward_Sortation_Area'].dropna().unique()]
@@ -53,30 +55,31 @@ page_1_layout = html.Div(
             style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': '10px', 'border': '3px solid white', 'marginBottom': '10px'},
             children=[
                 dcc.RadioItems(
-                    id='selected_map_type',
+                    id='map-radioitem',
                     inline=True,
                     options=[{
                             "label":
                                 [
-                                    html.Img(src="image_files/heatmap_icon.png", height=30),
+                                    html.Img(src="image_files/heatmap_icon.png", height=iconHeight),
                                     html.Span("Density Heatmap", style={'font-size': 15, 'padding-left': 10}),
                                 ],
                             "value": "Density Heatmap"},
                         {
                             "label":
                                 [
-                                    html.Img(src="image_files/choropleth_icon.png", height=30),
+                                    html.Img(src="image_files/choropleth_icon.png", height=iconHeight),
                                     html.Span("Choropleth Tile Map", style={'font-size': 15, 'padding-left': 10}),
                                 ], 
                             "value": "Choropleth Tile Map"},
                         {
                             "label":
                                 [
-                                    html.Img(src="image_files/scatter_icon.png", height=30),
+                                    html.Img(src="image_files/scatter_icon.png", height=iconHeight),
                                     html.Span("Point Scatter Map", style={'font-size': 15, 'padding-left': 10}),
                                 ],
                             "value": "Point Scatter Map"}], 
                     labelStyle={"display": "flex", "align-items": "center"},
+                    value='Point Scatter Map'
                 ),
                 dcc.Graph(id='map-plot', style=STYLE_CONFIG['graph'])
             ]
@@ -85,30 +88,31 @@ page_1_layout = html.Div(
             style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': '10px', 'border': '3px solid white', 'marginBottom': '10px'},
             children=[
                 dcc.RadioItems(
-                    id='selected_table_type',
+                    id='table-radioitem',
                     inline=True,
                     options=[{
                             "label":
                                 [
-                                    html.Img(src="image_files/circlearrows3_icon.png", height=30),
+                                    html.Img(src="image_files/circlearrows3_icon.png", height=iconHeight),
                                     html.Span("Notifications", style={'font-size': 15, 'padding-left': 10}),
                                 ],
                             "value": "Notifications"},
                         {
                             "label":
                                 [
-                                    html.Img(src="image_files/pivot_icon.png", height=30),
+                                    html.Img(src="image_files/pivot_icon.png", height=iconHeight),
                                     html.Span("Totals", style={'font-size': 15, 'padding-left': 10}),
                                 ], 
                             "value": "Totals"},
                         {
                             "label":
                                 [
-                                    html.Img(src="image_files/percent_icon.png", height=30),
+                                    html.Img(src="image_files/percent_icon.png", height=iconHeight),
                                     html.Span("Percentages", style={'font-size': 15, 'padding-left': 10}),
                                 ],
                             "value": "Percentages"}],    
                     labelStyle={"display": "flex", "align-items": "center"},
+                    value='Notifications'
                 ),
                 dash_table.DataTable(
                     id='pivot-table',
@@ -202,29 +206,30 @@ page_3_layout = html.Div(
             style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': '10px', 'border': '3px solid white', 'marginBottom': '10px'},
             children=[
                 dcc.RadioItems(
-                    id='selected_map_type',
+                    id='map-radioitem',
                     options=[{
                             "label":
                                 [
-                                    html.Img(src="image_files/heatmap_icon.png", height=30),
+                                    html.Img(src="image_files/heatmap_icon.png", height=iconHeight),
                                     html.Span("Density Heatmap", style={'font-size': 15, 'padding-left': 10}),
                                 ],
                             "value": "Density Heatmap"},
                         {
                             "label":
                                 [
-                                    html.Img(src="image_files/choropleth_icon.png", height=30),
+                                    html.Img(src="image_files/choropleth_icon.png", height=iconHeight),
                                     html.Span("Choropleth Tile Map", style={'font-size': 15, 'padding-left': 10}),
                                 ], 
                             "value": "Choropleth Tile Map"},
                         {
                             "label":
                                 [
-                                    html.Img(src="image_files/scatter_icon.png", height=30),
+                                    html.Img(src="image_files/scatter_icon.png", height=iconHeight),
                                     html.Span("Point Scatter Map", style={'font-size': 15, 'padding-left': 10}),
                                 ],
                             "value": "Point Scatter Map"}], 
                     labelStyle={"display": "flex", "align-items": "center"},
+                    value='Point Scatter Map'
                 ),                
                 dcc.Graph(id='map-plot', style=STYLE_CONFIG['graph'])
             ]
@@ -267,26 +272,26 @@ page_4_layout = html.Div(
             style={'backgroundColor': STYLE_CONFIG['backgroundColor'], 'padding': '10px', 'border': '3px solid white', 'marginBottom': '10px'},
             children=[
                 dcc.RadioItems(
-                    id='selected_table_type',
+                    id='table-radioitem',
                     inline=True,
                     options=[{
                             "label":
                                 [
-                                    html.Img(src="image_files/circlearrows3_icon.png", height=30),
+                                    html.Img(src="image_files/circlearrows3_icon.png", height=iconHeight),
                                     html.Span("Notifications", style={'font-size': 15, 'padding-left': 10}),
                                 ],
                             "value": "Notifications"},
                         {
                             "label":
                                 [
-                                    html.Img(src="image_files/pivot_icon.png", height=30),
+                                    html.Img(src="image_files/pivot_icon.png", height=iconHeight),
                                     html.Span("Totals", style={'font-size': 15, 'padding-left': 10}),
                                 ], 
                             "value": "Totals"},
                         {
                             "label":
                                 [
-                                    html.Img(src="image_files/percent_icon.png", height=30),
+                                    html.Img(src="image_files/percent_icon.png", height=iconHeight),
                                     html.Span("Percentages", style={'font-size': 15, 'padding-left': 10}),
                                 ],
                             "value": "Percentages"}],    
@@ -355,17 +360,16 @@ def register_callbacks(app):
 
     @app.callback(
         Output('map-plot', 'figure'),
-        [Input('area-dropdown', 'value'), Input('condition-dropdown', 'value')],
-        [Input('url', 'pathname')],
-        [Input('selected_map_type', 'value')]
+        [Input('area-dropdown', 'value'), Input('condition-dropdown', 'value'), Input('map-radioitem', 'value')],
+        [Input('url', 'pathname')]
     )
-    def update_map(selected_area, selected_condition, pathname, selected_map_type):
+    def update_map(selected_area, selected_condition, selected_map, pathname):
         if pathname not in ['/map', '/']:
             raise PreventUpdate
         try:
             df_map = fetch_data('map_table')
             df_map_summary = fetch_data('aggregated_fsa_table')
-            map_plot = create_map(df_map, df_map_summary, selected_map_type, selected_area, selected_condition)
+            map_plot = create_map(df_map, df_map_summary, selected_map, selected_area, selected_condition)
             return map_plot
         except Exception as e:
             print(f"Error in update_map: {e}")
@@ -373,17 +377,16 @@ def register_callbacks(app):
 
     @app.callback(
         Output('pivot-table', 'data'),
-        [Input('area-dropdown', 'value'), Input('condition-dropdown', 'value')],
-        [Input('url', 'pathname')],
-        [Input('selected_table_type', 'value')]
+        [Input('area-dropdown', 'value'), Input('condition-dropdown', 'value'), Input('table-radioitem', 'value')],
+        [Input('url', 'pathname')]
     )
-    def update_table(selected_area, selected_condition, pathname, selected_table_type):
+    def update_table(selected_area, selected_condition, selected_table, pathname):
         if pathname not in ['/data-table', '/']:
             raise PreventUpdate
         try:
             df_table = fetch_data('data_table')
             df_table_summary = fetch_data('aggregated_fsa_table')
-            table_data = create_table(df_table, df_table_summary, selected_table_type, selected_area, selected_condition)
+            table_data = create_table(df_table, df_table_summary, selected_table, selected_area, selected_condition)
             return table_data
         except Exception as e:
             print(f"Error in update_table: {e}")
