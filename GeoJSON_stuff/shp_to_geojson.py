@@ -9,8 +9,8 @@ def reproject_geometry(geometry, src_crs, dest_crs):
     return transform(project, geometry)
 
 # File paths
-input_shapefile = 'GeoJSON_stuff/Shapefile/Census_subdivs/lcsd000a21a_e.shp'
-output_geojson = 'censsubdivs_output_geojson_manitoba.geojson'
+input_shapefile = '/workspaces/asbestos-dashboard-heroku/GeoJSON_stuff/Shapefile/electoral_districs_can/lfed000b21a_e.shp'
+output_geojson = 'fed_electoral_output_geojson_manitoba.geojson'
 
 # Read the shapefile
 gdf = gpd.read_file(input_shapefile)
@@ -27,8 +27,8 @@ gdf = gdf.to_crs(dest_crs)
 gdf_filtered = gdf[gdf['PRUID'] == "46"]
 
 # Save to GeoJSON - uncomment if filtering for specific province
-# gdf_filtered.to_file(output_geojson, driver='GeoJSON')
-
 gdf_filtered.to_file(output_geojson, driver='GeoJSON')
+
+# gdf.to_file(output_geojson, driver='GeoJSON')
 
 print(f"GeoJSON file has been saved to {output_geojson}")

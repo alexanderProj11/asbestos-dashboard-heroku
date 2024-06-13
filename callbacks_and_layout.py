@@ -57,9 +57,9 @@ page_1_layout = html.Div(
                 dcc.Dropdown(
                     id='map-dropdown',
                     options=[
-                        {"label": "Density Heatmap", "value": "Density Heatmap"},
-                        {"label": "Choropleth Tile Map", "value": "Choropleth Tile Map"},
-                        {"label": "Point Scatter Map", "value": "Point Scatter Map"}
+                        {"label": html.Span([html.Img(src='/workspaces/asbestos-dashboard-heroku/assets/heatmap_icon.png', height=iconHeight), " Density Heatmap"]), "value": "Density Heatmap"},
+                        {"label": html.Span([html.Img(src='/workspaces/asbestos-dashboard-heroku/assets/choropleth_icon.png', height=iconHeight), " Choropleth Tile Map"]), "value": "Choropleth Tile Map"},
+                        {"label": html.Span([html.Img(src='/workspaces/asbestos-dashboard-heroku/assets/scatter_icon.png', height=iconHeight), " Point Scatter Map"]), "value": "Point Scatter Map"}
                     ],
                     value='Point Scatter Map',
                     style=STYLE_CONFIG['dropdown']
@@ -73,9 +73,9 @@ page_1_layout = html.Div(
                 dcc.Dropdown(
                     id='table-dropdown',
                     options=[
-                        {"label": "Notifications", "value": "Notifications"},
-                        {"label": "Totals", "value": "Totals"},
-                        {"label": "Percentages", "value": "Percentages"}
+                        {"label": html.Span([html.Img(src='/workspaces/asbestos-dashboard-heroku/assets/circlearrows3_icon.png', height=iconHeight), " Notifications"]), "value": "Notifications"},
+                        {"label": html.Span([html.Img(src='/workspaces/asbestos-dashboard-heroku/assets/sigma_icon.png', height=iconHeight), " Totals"]), "value": "Totals"},
+                        {"label": html.Span([html.Img(src='/workspaces/asbestos-dashboard-heroku/assets/percent_icon.png', height=iconHeight), " Percentages"]), "value": "Percentages"}
                     ],
                     value='Notifications',
                     style=STYLE_CONFIG['dropdown']
@@ -174,9 +174,9 @@ page_3_layout = html.Div(
                 dcc.Dropdown(
                     id='map-dropdown',
                     options=[
-                        {"label": "Density Heatmap", "value": "Density Heatmap"},
-                        {"label": "Choropleth Tile Map", "value": "Choropleth Tile Map"},
-                        {"label": "Point Scatter Map", "value": "Point Scatter Map"}
+                        {"label": html.Span([html.Img(src='/workspaces/asbestos-dashboard-heroku/assets/heatmap_icon.png', height=iconHeight), " Density Heatmap"]), "value": "Density Heatmap"},
+                        {"label": html.Span([html.Img(src='/workspaces/asbestos-dashboard-heroku/assets/choropleth_icon.png', height=iconHeight), " Choropleth Tile Map"]), "value": "Choropleth Tile Map"},
+                        {"label": html.Span([html.Img(src='/workspaces/asbestos-dashboard-heroku/assets/scatter_icon.png', height=iconHeight), " Point Scatter Map"]), "value": "Point Scatter Map"}
                     ],
                     value='Point Scatter Map',
                     style=STYLE_CONFIG['dropdown']
