@@ -40,8 +40,8 @@ def calculate_density_column(df):
         grid_size = 0.01  # Define grid cell size (adjust as needed)
 
         # Calculate the number of grid cells in latitude and longitude directions
-        lat_bins = np.linspace(df['Latitude'].min(), df['Latitude'].max(), num=4090)
-        lon_bins = np.linspace(df['Longitude'].min(), df['Longitude'].max(), num=6530)
+        lat_bins = np.linspace(df['Latitude'].min(), df['Latitude'].max(), num=8090)
+        lon_bins = np.linspace(df['Longitude'].min(), df['Longitude'].max(), num=10530)
 
         # Debug: Print dimensions of lat_bins and lon_bins
         logging.info(f"lat_bins dimensions: {lat_bins.shape}")
