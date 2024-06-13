@@ -181,8 +181,8 @@ def create_map(df, df2, selected_map, selected_area, selected_condition):
         else:  # Scatter Map
             fig = create_scatter_map(filtered_df, geojson_data, selected_area, selected_condition)
                 
-        # Set uirevision based on selection criteria
-        unique_id = f"{selected_area}_{selected_condition}"
+        clocktime = time.strftime("%H:%M:%S")
+        unique_id = f"{selected_area}_{selected_condition}_{clocktime}"
         fig.update_layout(uirevision=unique_id)
         
         return fig
@@ -200,7 +200,7 @@ def create_density_heatmap(filtered_df, selected_area, selected_condition):
 
     fig = px.density_mapbox(
         filtered_df, lat='Latitude', lon='Longitude', color_continuous_scale='plasma',
-        z='Density', radius=30, center=center, zoom=zoom, mapbox_style="carto-positron",
+        z='Density', radius=30, center=center, zoom=zoom, mapbox_style="satellite",
         hover_name='Forward_Sortation_Area'
     )
     fig.update_layout(
@@ -208,7 +208,7 @@ def create_density_heatmap(filtered_df, selected_area, selected_condition):
         margin={"r": 0, "t": 0, "l": 0, "b": 0}
     )
     # Set uirevision based on selection criteria
-    clocktime = time.strftime('%H:%M:%S')
+    clocktime = time.strftime("%H:%M:%S")
     unique_id = f"{selected_area}_{selected_condition}_{clocktime}"
     fig.update_layout(uirevision=unique_id)
     
@@ -233,20 +233,13 @@ def create_choropleth_map(df2, geojson_data, selected_area, selected_condition):
         choropleth_df, geojson=geojson_data, featureidkey="properties.CFSAUID",
         locations='Forward_Sortation_Area', color=color, color_continuous_scale="rdbu_r",
         hover_name='Forward_Sortation_Area', zoom=zoom, center=center,
-        mapbox_style="carto-positron",
+        mapbox_style="satellite",
     )
     fig.update_layout(
         mapbox_accesstoken=MAPBOX_ACCESS_TOKEN,
-        margin={"r": 0, "t": 0, "l": 0, "b": 0},
-        mapbox_layers=[{
-            "source": geojson_data,
-            "type": "line",
-            "opacity": 1,
-            "color": "rgba(238, 180, 180, 10)",
-        }]
+        margin={"r": 0, "t": 0, "l": 0, "b": 0}
     )
-    # Set uirevision based on selection criteria
-    clocktime = time.strftime('%H:%M:%S')
+    clocktime = time.strftime("%H:%M:%S")
     unique_id = f"{selected_area}_{selected_condition}_{clocktime}"
     fig.update_layout(uirevision=unique_id)
     return fig
@@ -275,13 +268,12 @@ def create_scatter_map(filtered_df, geojson_data, selected_area, selected_condit
         mapbox_layers=[{
             "source": geojson_data,
             "type": "line",
-            "below": "natural-labels",
+            "below": "place-labels",
             "opacity": 1,
-            "color": "rgba(238, 180, 180, 10)",
+            "color": "black",
         }]
     )
-    # Set uirevision based on selection criteria
-    clocktime = time.strftime('%H:%M:%S')
+    clocktime = time.strftime("%H:%M:%S")
     unique_id = f"{selected_area}_{selected_condition}_{clocktime}"
     fig.update_layout(uirevision=unique_id)
     
