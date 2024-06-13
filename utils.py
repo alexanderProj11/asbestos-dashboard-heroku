@@ -235,6 +235,7 @@ def create_choropleth_map(df2, geojson_data, selected_area, selected_condition):
         hover_name='Forward_Sortation_Area', zoom=zoom, center=center,
         mapbox_style="satellite",
     )
+        
     fig.update_layout(
         mapbox_accesstoken=MAPBOX_ACCESS_TOKEN,
         margin={"r": 0, "t": 0, "l": 0, "b": 0}
