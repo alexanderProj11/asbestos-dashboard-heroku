@@ -9,8 +9,8 @@ def reproject_geometry(geometry, src_crs, dest_crs):
     return transform(project, geometry)
 
 # File paths
-input_shapefile = 'GeoJSON_stuff/Shapefile/lfsa000a16a_e.shp'
-output_geojson = 'output_geojson_manitoba_fsa.geojson'
+input_shapefile = 'GeoJSON_stuff/Shapefile/Census_subdivs/lcsd000a21a_e.shp'
+output_geojson = 'censsubdivs_output_geojson_manitoba.geojson'
 
 # Read the shapefile
 gdf = gpd.read_file(input_shapefile)
@@ -23,11 +23,12 @@ dest_crs = 'epsg:4326'  # The EPSG code for WGS 84
 gdf = gdf.to_crs(dest_crs)
 
 # Filter the GeoDataFrame for specific province
-gdf_filtered = gdf[gdf['PRNAME'] == 'Manitoba']
+# gdf_filtered = gdf[gdf['PRNAME'] == 'Manitoba']
+gdf_filtered = gdf[gdf['PRUID'] == "46"]
 
 # Save to GeoJSON - uncomment if filtering for specific province
-gdf_filtered.to_file(output_geojson, driver='GeoJSON')
+# gdf_filtered.to_file(output_geojson, driver='GeoJSON')
 
-# gdf.to_file(output_geojson, driver='GeoJSON')
+gdf_filtered.to_file(output_geojson, driver='GeoJSON')
 
 print(f"GeoJSON file has been saved to {output_geojson}")

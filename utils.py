@@ -68,7 +68,7 @@ def create_chart(df, selected_area, selected_condition):
     try:
         
         df_chart = df.copy()
-        df_chart = df_chart[df_chart['Forward_Sortation_Area'] != 'Overall']
+        df_chart = df_chart[df_chart['Forward_Sortation_Area'] != 'Total']
         
         if selected_area == "All Areas":
             if selected_condition == "All Conditions":
@@ -140,11 +140,17 @@ def create_table(df, df2, selected_table, selected_area, selected_condition):
         elif selected_table == "Totals":
             total_columns = ['Forward_Sortation_Area', 'Total_Notifs', 'Total_Vermiculite', 'Total_Piping', 'Total_Drywall', 'Total_Insulation', 'Total_Tiling', 'Total_Floor_Tiles', 'Total_Ceiling_Tiles', 'Total_Ducting', 'Total_Plaster', 'Total_Stucco_Stipple', 'Total_Fittings']
             summary_df = df2[total_columns].copy()
+            summary_df = summary_df[summary_df['Forward_Sortation_Area'] != 'Total']
             return summary_df.to_dict('records')
         else:
             percentage_columns = ['Forward_Sortation_Area', 'Vermiculite_Percent', 'Piping_Percent', 'Drywall_Percent', 'Insulation_Percent', 'Tiling_Percent', 'Floor_Tiles_Percent', 'Ceiling_Tiles_Percent', 'Ducting_Percent', 'Plaster_Percent', 'Stucco_Stipple_Percent', 'Fittings_Percent']
             percentage_df = df2[percentage_columns].copy()
+            percentage_df = percentage_df[percentage_df['Forward_Sortation_Area'] != 'Total']
+            for item in percentage_columns:
+                if item!= 'Forward_Sortation_Area':
+                    percentage_df[item] = percentage_df[item].str.rstrip('%').astype(float)
             return percentage_df.to_dict('records')
+        
     except Exception as e:
         print(f"Error creating table: {e}")
         return []
@@ -175,7 +181,7 @@ def create_map(df, df2, selected_map, selected_area, selected_condition):
 
     try:
         if selected_map == "Density Heatmap":
-            fig = create_density_heatmap(filtered_df, selected_area, selected_condition)
+            fig = create_density_heatmap(filtered_df, geojson_data, selected_area, selected_condition)
         elif selected_map == "Choropleth Tile Map":
             fig = create_choropleth_map(df2, geojson_data, selected_area, selected_condition)
         else:  # Scatter Map
@@ -184,14 +190,14 @@ def create_map(df, df2, selected_map, selected_area, selected_condition):
         clocktime = time.strftime("%H:%M:%S")
         unique_id = f"{selected_area}_{selected_condition}_{clocktime}"
         fig.update_layout(uirevision=unique_id)
-        
+
         return fig
     
     except Exception as e:
         print(f"Error creating map: {e}")
         return px.scatter_mapbox(title="Error creating map")
 
-def create_density_heatmap(filtered_df, selected_area, selected_condition):
+def create_density_heatmap(filtered_df, geojson_data, selected_area, selected_condition):
     center = {
         "lat": filtered_df['Latitude'].median(),
         "lon": filtered_df['Longitude'].median()
@@ -200,7 +206,7 @@ def create_density_heatmap(filtered_df, selected_area, selected_condition):
 
     fig = px.density_mapbox(
         filtered_df, lat='Latitude', lon='Longitude', color_continuous_scale='plasma',
-        z='Density', radius=30, center=center, zoom=zoom, mapbox_style="satellite",
+        z='Density', radius=30, center=center, zoom=zoom, mapbox_style="satellite-streets",
         hover_name='Forward_Sortation_Area'
     )
     fig.update_layout(
@@ -220,6 +226,8 @@ def create_choropleth_map(df2, geojson_data, selected_area, selected_condition):
         "lat": 49.89106721862937,
         "lon": -97.13086449579419
     }
+    choropleth_df = choropleth_df[choropleth_df['Forward_Sortation_Area'] != 'Total']
+    
     if selected_condition != "All Conditions":
         # Remove the percentage symbol from the string in data
         choropleth_df[f"{selected_condition}_Percent"] = choropleth_df[f"{selected_condition}_Percent"].str.rstrip('%').astype(float)
@@ -227,7 +235,7 @@ def create_choropleth_map(df2, geojson_data, selected_area, selected_condition):
     else:
         color = 'Total_Notifs'
 
-    zoom = 12
+    zoom = 10
 
     fig = px.choropleth_mapbox(
         choropleth_df, geojson=geojson_data, featureidkey="properties.CFSAUID",
@@ -257,22 +265,32 @@ def create_scatter_map(filtered_df, geojson_data, selected_area, selected_condit
         hover_name='contractor',
         hover_data=['formattedAddress', 'startDate', 'postalCode', 'confirmationNo'],
         size_max=5,
-        zoom=12 if selected_area == "All Areas" else 14,
+        zoom=10 if selected_area == "All Areas" else 12,
         center=center,
     )
     # Adjust opacity of the scatter points
-    fig.update_traces(marker={'opacity': 0.75})
+    fig.update_traces(marker={'opacity': 0.75, 'allowoverlap': True})
     fig.update_layout(
         mapbox_style="streets",
         mapbox_accesstoken=MAPBOX_ACCESS_TOKEN,
         margin={"r": 0, "t": 0, "l": 0, "b": 0},
         mapbox_layers=[{
-            "source": geojson_data,
+            "minzoom": 0,
+            "maxzoom": 22,
             "type": "line",
-            "below": "place-labels",
-            "opacity": 1,
-            "color": "black",
-        }]
+            "source": "composite",
+            "color": "hsl(0, 96%, 50%)",
+            "opacity": 0.25,
+            "line": {
+            "dash": [
+                3,
+                1
+            ],
+            },
+            "below": "traces",
+            "source": geojson_data
+            }     
+            ]
     )
     clocktime = time.strftime("%H:%M:%S")
     unique_id = f"{selected_area}_{selected_condition}_{clocktime}"
